@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Product;
+
 
 class HustleController extends Controller
 {
@@ -100,6 +102,13 @@ class HustleController extends Controller
         if (!session()->has('usuario_autenticado')) return redirect()->route('login');
         return view('Hustle.perfil');
     }
+
+    // Muestra la pantalla principal de la tienda (Index)
+    public function showIndex() {
+    if (!session()->has('usuario_autenticado')) return redirect()->route('login');
+    return view('Hustle.index'); 
+}
+
 
     // Muestra el perfil del usuario activo (Cliente o Administrador)
     public function showPerfil() {

@@ -2,7 +2,7 @@
   <div class="container">
     
     <!-- BRAND (Izquierda) -->
-    <a class="navbar-brand fw-black tracking-wider text-white fs-4" href="{{ route('welcome') }}">
+    <a class="navbar-brand fw-black tracking-wider text-white fs-4" href="{{ route('index') }}">
         HUSTLE<span class="text-secondary">HOUSE</span>
     </a>
 

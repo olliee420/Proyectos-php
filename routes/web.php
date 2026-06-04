@@ -32,6 +32,7 @@ Route::get('/logout', [HustleController::class, 'logout'])->name('logout');
 Route::get('/menu', [HustleController::class, 'showMenu'])->name('menu');
 Route::get('/perfil', [HustleController::class, 'showPerfil'])->name('perfil');
 Route::get('/catalogo', [HustleController::class, 'showCatalogo'])->name('catalogo');
+Route::get('/index', [HustleController::class, 'showIndex'])->name('index');
 
 
 // ==========================================
