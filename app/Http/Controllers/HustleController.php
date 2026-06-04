@@ -38,7 +38,7 @@ class HustleController extends Controller
                 $request->session()->put('usuario_rol', $usuario['rol'] ?? 'cliente');
                 $request->session()->regenerate();
 
-                return redirect()->to('/menu');
+                return redirect()->to('/perfil');
             }
         }
 
@@ -63,12 +63,11 @@ class HustleController extends Controller
             return back()->withErrors(['email' => 'Este correo electrónico ya está registrado.']);
         }
 
-        $ultimoUsuario = DB::connection('mongodb')->table('Usuarios')
-            ->orderBy('_id', 'desc')->first();
+        // OPTIMIZACIÓN: Buscamos directamente el valor numérico más alto en la colección
+        $ultimoId = DB::connection('mongodb')->table('Usuarios')->max('_id');
             
-        // Blindaje para la lectura del ID incremental en el registro
-        $ultimoId = $ultimoUsuario ? ((array) $ultimoUsuario)['_id'] : 0;
-        $nuevoId = $ultimoId + 1;
+        // Forzamos a entero (si es null porque la tabla está vacía, se convierte en 0) y sumamos 1
+        $nuevoId = (int)$ultimoId + 1;
 
         DB::connection('mongodb')->table('Usuarios')->insert([
             '_id' => $nuevoId,
@@ -86,7 +85,7 @@ class HustleController extends Controller
         $request->session()->put('usuario_rol', 'cliente');
         $request->session()->regenerate();
 
-        return redirect()->to('/menu');
+        return redirect()->to('/inicio');
     }
 
     // Cierre de sesión limpio
@@ -99,7 +98,7 @@ class HustleController extends Controller
     // Redirecciona al menú principal dinámico
     public function showMenu() {
         if (!session()->has('usuario_autenticado')) return redirect()->route('login');
-        return view('Hustle.menu');
+        return view('Hustle.perfil');
     }
 
     // Muestra el perfil del usuario activo (Cliente o Administrador)
