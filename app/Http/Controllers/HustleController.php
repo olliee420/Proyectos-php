@@ -111,7 +111,6 @@ class HustleController extends Controller
 
         $producto = DB::connection('mongodb')->table('products')
             ->where('_id', (int)$request->producto_id)
-            ->orWhere('id', (int)$request->producto_id)
             ->first();
 
         if (!$producto) {
@@ -200,7 +199,7 @@ class HustleController extends Controller
             return redirect()->back()->withErrors(['sku' => 'El SKU ingresado ya pertenece a otra prenda registrada.'])->withInput();
         }
 
-        $maxId = DB::connection('mongodb')->table('products')->max('id');
+        $maxId = DB::connection('mongodb')->table('products')->max('_id');
         $ultimoId = $maxId ? (int)$maxId : 0;
         $nuevoId = $ultimoId + 1;
 
@@ -220,7 +219,7 @@ class HustleController extends Controller
         }
 
         DB::connection('mongodb')->table('products')->insert([
-            'id'             => $nuevoId,
+            '_id'            => $nuevoId,
             'categoria'      => $request->categoria,
             'nombre'         => $request->nombre,
             'sku'            => strtoupper($request->sku),
