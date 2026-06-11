@@ -57,7 +57,8 @@
           <!-- ZONA EXCLUSIVA ADMIN -->
           @if(session('usuario_rol') === 'admin')
             <li class="nav-item">
-              <a class="nav-link text-warning fw-bold hover-light" href="{{ route('admin.historial') }}">🛠️ Panel Admin</a>
+              <a class="nav-link text-warning fw-bold hover-light" href="{{ route('admin.panel') }}">🛠 Panel Admin</a>
+
             </li>
           @endif
 

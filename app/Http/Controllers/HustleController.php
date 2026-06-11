@@ -52,43 +52,54 @@ class HustleController extends Controller
     // Procesa el registro insertando directamente en MongoDB
     public function registro(Request $request) 
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
 
-        $existe = DB::connection('mongodb')->table('Usuarios')
-            ->where('email', $request->email)->first();
+    $existe = DB::connection('mongodb')->table('Usuarios')
+        ->where('email', $request->email)->first();
 
-        if ($existe) {
-            return back()->withErrors(['email' => 'Este correo electrónico ya está registrado.']);
-        }
-
-        // OPTIMIZACIÓN: Buscamos directamente el valor numérico más alto en la colección
-        $ultimoId = DB::connection('mongodb')->table('Usuarios')->max('_id');
-            
-        // Forzamos a entero (si es null porque la tabla está vacía, se convierte en 0) y sumamos 1
-        $nuevoId = (int)$ultimoId + 1;
-
-        DB::connection('mongodb')->table('Usuarios')->insert([
-            '_id' => $nuevoId,
-            'nombre' => $request->nombre,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'rol' => 'cliente',
-            'fecha_creacion' => now()
-        ]);
-
-        // Iniciar la sesión de forma inmediata con los datos creados
-        $request->session()->put('usuario_autenticado', true);
-        $request->session()->put('usuario_id', $nuevoId);
-        $request->session()->put('usuario_nombre', $request->nombre);
-        $request->session()->put('usuario_rol', 'cliente');
-        $request->session()->regenerate();
-
-        return redirect()->to('/inicio');
+    if ($existe) {
+        return back()->withErrors(['email' => 'Este correo electrónico ya está registrado.']);
     }
+
+    // SOLUCIÓN PARA MONGO: Obtenemos el último documento insertado ordenándolo de forma descendente por _id
+    $ultimoUsuario = DB::connection('mongodb')->table('Usuarios')
+        ->orderBy('_id', 'desc')
+        ->first();
+        
+    // Si la colección está vacía inicializamos en 0, de lo contrario extraemos el ID numérico
+    // Manejamos tanto formato de objeto como de array por compatibilidad con el driver de MongoDB
+    if (!$ultimoUsuario) {
+        $ultimoId = 0;
+    } else {
+        $ultimoId = is_array($ultimoUsuario) ? ($ultimoUsuario['_id'] ?? 0) : ($ultimoUsuario->_id ?? 0);
+    }
+        
+    // Forzamos a entero y sumamos 1 para el nuevo registro consecutivo
+    $nuevoId = (int)$ultimoId + 1;
+
+    DB::connection('mongodb')->table('Usuarios')->insert([
+        '_id' => $nuevoId,
+        'nombre' => $request->nombre,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'rol' => 'cliente',
+        'fecha_creacion' => now()
+    ]);
+
+    // Iniciar la sesión de forma inmediata con los datos creados
+    $request->session()->put('usuario_autenticado', true);
+    $request->session()->put('usuario_id', $nuevoId);
+    $request->session()->put('usuario_nombre', $request->nombre);
+    $request->session()->put('usuario_rol', 'cliente');
+    $request->session()->regenerate();
+
+    return redirect()->to('/index');
+    }
+
 
     // Cierre de sesión limpio
     public function logout(Request $request) {
@@ -117,29 +128,202 @@ class HustleController extends Controller
     }
 
     // Muestra el catálogo de Streetwear
-    public function showCatalogo() {
-        if (!session()->has('usuario_autenticado')) return redirect()->route('login');
-        return view('Hustle.catalogo');
-    }
+    public function showCatalogo()
+{
+    // Recupera todos los productos guardados en tu colección de MongoDB
+    $productos = DB::connection('mongodb')->table('products')->get();
+
+    // Carga la vista enviándole la colección de datos
+    return view('Hustle.catalogo', compact('productos'));
+}
+
 
     // ZONA EXCLUSIVA CLIENTES
-    public function showCarrito() { 
-        if (!session()->has('usuario_autenticado') || session('usuario_rol') !== 'cliente') return redirect()->route('login');
-        return view('Hustle.carrito'); 
+    public function showCarrito(Request $request)
+    {
+    // Obtener el carrito de la sesión (si no existe, pasará un array vacío)
+    $carrito = $request->session()->get('carrito', []);
+
+    // Calcular el costo total sumando los precios de los artículos agregados
+    $totalEstimado = 0;
+    foreach($carrito as $item) {
+        $totalEstimado += $item['precio'] * $item['cantidad'];
     }
 
-    public function showPedidos() { 
-        if (!session()->has('usuario_autenticado') || session('usuario_rol') !== 'cliente') return redirect()->route('login');
-        return view('Hustle.pedidos'); 
+    return view('Hustle.carrito', compact('carrito', 'totalEstimado'));
     }
+
+    public function agregarAlCarrito(Request $request)
+
+    {
+    // 1. Validar que vengan los datos obligatorios del catálogo
+    $request->validate([
+        'producto_id' => 'required',
+        'talla'       => 'required|string'
+    ]);
+
+    // 2. Buscar los datos reales de la prenda en MongoDB usando su _id (convertido a entero)
+    $producto = DB::connection('mongodb')->table('products')
+        ->where('_id', (int)$request->producto_id)
+        ->first();
+
+    if (!$producto) {
+        return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
+    }
+
+    // Convertir el documento a array para mayor comodidad en el manejo de sesiones NoSQL
+    $producto = (array) $producto;
+
+    // 3. Recuperar el carrito actual de la sesión (o inicializarlo si está vacío)
+    $carrito = $request->session()->get('carrito', []);
+
+    // Creamos una clave única combinando el ID y la Talla (así diferenciamos si compran la misma prenda en tallas distintas)
+    $cartKey = $producto['_id'] . '_' . $request->talla;
+
+    // 4. Si el artículo ya existe en la bolsa, sumamos 1 a la cantidad
+    if (isset($carrito[$cartKey])) {
+        $carrito[$cartKey]['cantidad']++;
+    } else {
+        // Si es nuevo, estructuramos el documento dentro del array del carrito
+        $carrito[$cartKey] = [
+            'id'          => $producto['_id'],
+            'nombre'      => $producto['nombre'],
+            'precio'      => (float) $producto['precio'],
+            'categoria'   => $producto['categoria'] ?? 'Prenda',
+            'imagen_path' => $producto['imagen_path'] ?? 'uploads/products/default.jpg',
+            'talla'       => $request->talla,
+            'cantidad'    => 1
+        ];
+    }
+
+    // 5. Guardar el estado actualizado en la sesión del usuario
+    $request->session()->put('carrito', $carrito);
+
+    return redirect()->route('carrito')->with('success', '¡Prenda añadida a tu bolsa con éxito!');
+    }
+
+
+    public function showPedidos(Request $request)
+    {
+    // 1. Obtener el ID del usuario logueado desde la sesión manual que creamos
+    $usuarioId = $request->session()->get('usuario_id');
+
+    // 2. Consultar en MongoDB los pedidos de ESTE usuario específico
+    $pedidos = DB::connection('mongodb')->table('Pedidos')
+                ->where('usuario_id', $usuarioId)
+                ->orderBy('fecha_creacion', 'desc')
+                ->get();
+
+    // 3. Mandar la variable a la vista pedidos.blade.php
+    return view('Hustle.pedidos', compact('pedidos'));
+    }
+
 
     // ZONA EXCLUSIVA ADMINISTRADORES
-    public function showHistorial() { 
-        if (!session()->has('usuario_autenticado') || session('usuario_rol') !== 'admin') return redirect()->route('login');
-        return view('Hustle.historial'); 
+
+    public function showAdminPanel()
+{
+    // Consultamos la colección 'Usuarios' de MongoDB ordenando por los más recientes
+    $usuarios = \Illuminate\Support\Facades\DB::connection('mongodb')->table('Usuarios')
+        ->orderBy('fecha_creacion', 'desc')
+        ->get();
+    
+    // Retornamos la vista en la carpeta Hustle
+    return view('Hustle.historial', compact('usuarios'));
+}
+
+public function destroyUser($id)
+{
+    // Eliminamos el cliente de MongoDB mapeando el ID único numérico
+    \Illuminate\Support\Facades\DB::connection('mongodb')->table('Usuarios')
+        ->where('_id', (int)$id)
+        ->delete();
+
+    return redirect()->back()->with('success', 'El usuario ha sido eliminado correctamente de Hustle House.');
+}
+
+    public function showHistorial()
+{
+    // Consultamos la colección 'Usuarios' de MongoDB ordenando por los más recientes
+    $usuarios = DB::connection('mongodb')->table('Usuarios')
+        ->orderBy('fecha_creacion', 'desc')
+        ->get();
+
+    // Retornamos la vista inyectándole la colección de datos real
+    return view('Hustle.historial', compact('usuarios'));
+}
+
+
+    public function storeProducto(Request $request) 
+{
+    // 1. Validación estricta de los campos y del archivo físico
+    $request->validate([
+        'categoria' => 'required|string',
+        'nombre'    => 'required|string|max:255',
+        'sku'       => 'required|string',
+        'precio'    => 'required|numeric|min:0',
+        'costo'     => 'required|numeric|min:0',
+        'imagen'    => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Límite de 2MB
+    ]);
+
+    // Verificamos si ya existe el SKU en la base de datos para evitar duplicados
+    $skuExiste = \Illuminate\Support\Facades\DB::connection('mongodb')->table('products')
+        ->where('sku', strtoupper($request->sku))
+        ->first();
+
+    if ($skuExiste) {
+        return redirect()->back()->withErrors(['sku' => 'El SKU ingresado ya pertenece a otra prenda registrada.'])->withInput();
     }
 
-    public function storeProducto(Request $request) {
-        // Se programará en el módulo de catálogo
+    // 2. CORRECCIÓN: Generación robusta del ID Numérico Autoincrementable para MongoDB NoSQL
+    // Buscamos directamente el valor numérico más alto registrado en la colección
+    $maxId = \Illuminate\Support\Facades\DB::connection('mongodb')->table('products')->max('_id');
+    
+    // Si max() devuelve null (colección vacía), iniciamos en 0. Si no, forzamos a entero el ID más alto.
+    $ultimoId = $maxId ? (int)$maxId : 0;
+    
+    // Sumamos 1 de forma estricta para garantizar que el nuevo ID sea el consecutivo correcto
+    $nuevoId = $ultimoId + 1;
+
+    // 3. Procesar y guardar la imagen física localmente en el servidor
+    $rutaImagen = 'uploads/products/default.jpg'; // Imagen por defecto de respaldo
+
+    if ($request->hasFile('imagen')) {
+        $file = $request->file('imagen');
+        
+        // Creamos un nombre limpio y único usando la estampa de tiempo actual
+        $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+        
+        // Definimos el directorio de destino dentro de la carpeta pública
+        $destinationPath = public_path('uploads/products');
+        
+        // Si la carpeta no existe de forma local, el servidor la creará automáticamente
+        if (!\Illuminate\Support\Facades\File::exists($destinationPath)) {
+            \Illuminate\Support\Facades\File::makeDirectory($destinationPath, 0755, true, true);
+        }
+
+        // Movemos físicamente la foto subida al directorio
+        $file->move($destinationPath, $filename);
+        
+        // Guardamos la ruta relativa final que requiere el HTML para renderizar
+        $rutaImagen = 'uploads/products/' . $filename;
     }
+
+    // 4. Inserción directa del documento en la colección NoSQL de MongoDB
+    \Illuminate\Support\Facades\DB::connection('mongodb')->table('products')->insert([
+        '_id'            => $nuevoId,
+        'categoria'      => $request->categoria,
+        'nombre'         => $request->nombre,
+        'sku'            => strtoupper($request->sku),
+        'precio'         => (float) $request->precio,
+        'costo'          => (float) $request->costo,
+        'imagen_path'    => $rutaImagen,
+        'fecha_creacion' => now()
+    ]);
+
+    // Regresamos al panel inyectando un mensaje temporal de éxito
+    return redirect()->route('admin.panel')->with('success', '¡Prenda guardada y publicada exitosamente en el drop!');
+}
+
+
 }

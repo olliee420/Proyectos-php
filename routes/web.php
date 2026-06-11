@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HustleController;
+ use App\Http\Controllers\AdminController;
 
 /*
 
@@ -41,9 +42,19 @@ Route::get('/index', [HustleController::class, 'showIndex'])->name('index');
 Route::get('/cliente/carrito', [HustleController::class, 'showCarrito'])->name('carrito');
 Route::get('/cliente/pedidos', [HustleController::class, 'showPedidos'])->name('pedidos');
 
+// Ruta para añadir productos a la bolsa
+Route::post('/carrito/agregar', [HustleController::class, 'agregarAlCarrito'])->name('carrito.agregar');
+
 
 // ==========================================
 // 4. ZONA EXCLUSIVA ADMINISTRADORES
 // ==========================================
-Route::get('/admin/historial', [HustleController::class, 'showHistorial'])->name('admin.historial');
+
+// 1. Ruta Maestra para cargar el Panel (Formulario + Tabla de Usuarios NoSQL)
+Route::get('/admin/panel', [HustleController::class, 'showAdminPanel'])->name('admin.panel');
+
+// 2. Ruta para procesar la subida física de la imagen y guardar la prenda en MongoDB
 Route::post('/admin/productos/guardar', [HustleController::class, 'storeProducto'])->name('admin.productos.store');
+
+// 3. Ruta segura para eliminar un cliente de la colección 'Usuarios'
+Route::delete('/admin/usuarios/{id}', [HustleController::class, 'destroyUser'])->name('admin.users.destroy');
