@@ -11,7 +11,7 @@ class Usuario extends Model implements AuthenticatableContract
     use Authenticatable;
 
     protected $connection = 'mongodb';
-    protected $collection = 'Usuarios';
+    protected $collection = 'usuarios';
     protected $primaryKey = '_id'; // Llave primaria de MongoDB
     public $incrementing = false;  // Decirle a Laravel que no intente autoincrementar como SQL
     protected $keyType = 'int';    // Especificar que tus IDs sembrados son enteros (1, 2, 3)
