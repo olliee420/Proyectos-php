@@ -87,7 +87,9 @@ class HustleController extends Controller
 
     public function showCatalogo()
     {
-        $productos = DB::connection('mongodb')->table('products')->get();
+        $productos = DB::connection('mongodb')->table('products')
+            ->where('vendido', '!=', true)
+            ->get();
         return view('Hustle.catalogo', compact('productos'));
     }
 
@@ -156,7 +158,10 @@ class HustleController extends Controller
         $usuarios = DB::connection('mongodb')->table('usuarios')
             ->orderBy('fecha_creacion', 'desc')
             ->get();
-        return view('Hustle.historial', compact('usuarios'));
+        $productos = DB::connection('mongodb')->table('products')
+            ->orderBy('fecha_creacion', 'desc')
+            ->get();
+        return view('Hustle.historial', compact('usuarios', 'productos'));
     }
 
     public function destroyUser($id)
@@ -232,5 +237,93 @@ class HustleController extends Controller
         return redirect()->route('admin.panel')->with('success', '¡Prenda guardada y publicada exitosamente en el drop!');
     }
 
+    public function editProducto($id)
+    {
+        $producto = DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->first();
+        if (!$producto) {
+            return redirect()->route('admin.panel')->with('error', 'Producto no encontrado.');
+        }
+        return view('Hustle.historial', [
+            'editProducto' => $producto,
+            'usuarios'    => DB::connection('mongodb')->table('usuarios')->orderBy('fecha_creacion', 'desc')->get(),
+            'productos'   => DB::connection('mongodb')->table('products')->orderBy('fecha_creacion', 'desc')->get(),
+        ]);
+    }
+
+    public function updateProducto(Request $request, $id)
+    {
+        $request->validate([
+            'categoria' => 'required|string',
+            'nombre'    => 'required|string|max:255',
+            'sku'       => 'required|string',
+            'precio'    => 'required|numeric|min:0',
+            'costo'     => 'required|numeric|min:0',
+            'imagen'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $producto = DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->first();
+
+        if (!$producto) {
+            return redirect()->route('admin.panel')->with('error', 'Producto no encontrado.');
+        }
+
+        $updateData = [
+            'categoria' => $request->categoria,
+            'nombre'    => $request->nombre,
+            'sku'       => strtoupper($request->sku),
+            'precio'    => (float) $request->precio,
+            'costo'     => (float) $request->costo,
+        ];
+
+        if ($request->hasFile('imagen')) {
+            $file = $request->file('imagen');
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $destinationPath = public_path('uploads/products');
+            if (!\Illuminate\Support\Facades\File::exists($destinationPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, 0755, true, true);
+            }
+            $file->move($destinationPath, $filename);
+            $updateData['imagen_path'] = 'uploads/products/' . $filename;
+        }
+
+        DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->update($updateData);
+
+        return redirect()->route('admin.panel')->with('success', 'Prenda actualizada correctamente.');
+    }
+
+    public function marcarVendido($id)
+    {
+        $producto = DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->first();
+
+        if (!$producto) {
+            return redirect()->route('admin.panel')->with('error', 'Producto no encontrado.');
+        }
+
+        $productoArr = (array)$producto;
+        $vendido = !($productoArr['vendido'] ?? false);
+
+        DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->update(['vendido' => $vendido]);
+
+        $msg = $vendido ? 'Prenda marcada como vendida.' : 'Prenda marcada como disponible.';
+        return redirect()->route('admin.panel')->with('success', $msg);
+    }
+
+    public function destroyProducto($id)
+    {
+        DB::connection('mongodb')->table('products')
+            ->where('_id', (int)$id)
+            ->delete();
+        return redirect()->route('admin.panel')->with('success', 'Prenda eliminada permanentemente.');
+    }
 
 }

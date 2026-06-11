@@ -56,5 +56,11 @@ Route::get('/admin/panel', [HustleController::class, 'showAdminPanel'])->name('a
 // 2. Ruta para procesar la subida física de la imagen y guardar la prenda en MongoDB
 Route::post('/admin/productos/guardar', [HustleController::class, 'storeProducto'])->name('admin.productos.store');
 
-// 3. Ruta segura para eliminar un cliente de la colección 'Usuarios'
+// 3. CRUD de Productos
+Route::get('/admin/productos/{id}/editar', [HustleController::class, 'editProducto'])->name('admin.productos.edit');
+Route::put('/admin/productos/{id}', [HustleController::class, 'updateProducto'])->name('admin.productos.update');
+Route::patch('/admin/productos/{id}/vendido', [HustleController::class, 'marcarVendido'])->name('admin.productos.vendido');
+Route::delete('/admin/productos/{id}', [HustleController::class, 'destroyProducto'])->name('admin.productos.destroy');
+
+// 4. Ruta segura para eliminar un cliente de la colección 'Usuarios'
 Route::delete('/admin/usuarios/{id}', [HustleController::class, 'destroyUser'])->name('admin.users.destroy');
