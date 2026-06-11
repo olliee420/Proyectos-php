@@ -1,320 +1,302 @@
-<!doctype html>
-<html lang="es" data-bs-theme="light">
-    <head>
-        <title>Title</title>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+@extends('layouts.app')
 
-        <!-- Bootstrap CSS v5.3.8 -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-            crossorigin="anonymous"
-        />
-        <style>
-            body {
-                background-color: #ffffff;
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-            }
+@section('title', 'Panel Admin — HUSTLE HOUSE')
 
-            @keyframes header-ping {
-            75%, 100% { transform: scale(2.5); opacity: 0; }
-    }
-
-            .fw-black { font-weight: 900; }
-            .admin-card {
-                border-radius: 16px;
-                border: none;
-            }
-            /* Contenedor simétrico para previsualizar imágenes en las tablas */
-            .admin-thumb-container {
-                width: 50px;
-                height: 50px;
-                background-color: #ffffff;
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                padding: 2px;
-            }
-            .admin-thumb-container img {
-                max-height: 100%;
-                width: auto;
-                object-fit: contain;
-            }
-
-    .hover-black:hover {
-        background-color: #000000 !important;
-        color: #ffffff !important;
-        border-color: #000000 !important;
-    }
-    .hover-danger:hover {
-        background-color: #dc3545 !important;
-        color: #ffffff !important;
-        border-color: #dc3545 !important;
-    }
-    #userSearch:focus {
-        border-color: #000000 !important;
-        background-color: #ffffff !important;
-    }
-
-        </style>
-    </head>
-
-    <body>
-        <header>
-            <!-- place navbar here -->
-             @include('Hustle.menu')
-        </header>
-        <main class="container my-5">
-           <!-- HEADER DEL PANEL: Estilo SaaS Avanzado -->
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 pb-4 border-bottom border-light-subtle gap-3">
-    <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
-            <h1 class="fw-black m-0 tracking-tight text-dark" style="font-size: 1.75rem; font-weight: 900; letter-spacing: -0.8px; text-transform: uppercase;">
-                Hustle House Control Panel
-            </h1>
-            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle text-uppercase px-2.5 py-1" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;">
-                Acceso Root
+@section('content')
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-12 w-full">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-10 pb-6 border-b border-white/5">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <h1 class="font-display text-3xl uppercase text-paper">Hustle House Control Panel</h1>
+                <span class="px-2.5 py-1 bg-rust/20 text-rust text-xs font-bold uppercase tracking-wider rounded-full">Root</span>
+            </div>
+            <p class="text-steel text-sm">Portal de administración para gestión de productos, inventario y cuentas de usuarios.</p>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-soft shrink-0">
+            <span class="relative flex w-2 h-2">
+                <span class="absolute inline-flex w-full h-full rounded-full bg-rust opacity-75 animate-ping"></span>
+                <span class="relative inline-flex w-2 h-2 rounded-full bg-rust"></span>
             </span>
-        </div>
-        <p class="text-secondary m-0 small">Portal de administración para la gestión de productos, inventario y cuentas de usuarios.</p>
-    </div>
-    
-    <!-- Indicador de Estado en Vivo -->
-    <div class="bg-success-subtle border border-success-subtle text-success px-3 py-2 rounded-3 d-flex align-items-center gap-2.5 shadow-sm">
-        <span class="position-relative d-flex" style="width: 8px; height: 8px;">
-            <span class="animate-ping position-absolute inline-flex h-100 w-100 rounded-circle bg-success opacity-75" style="animation: header-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
-            <span class="position-relative inline-flex rounded-circle bg-success" style="width: 8px; height: 8px;"></span>
-        </span>
-        <div class="lh-1">
-            <span class="d-block text-uppercase fw-bold text-success-emphasis" style="font-size: 0.65rem; letter-spacing: 0.5px;">Modo Admin Activo</span>
-            <span class="text-secondary small font-monospace" style="font-size: 0.72rem;">Administrador Autenticado</span>
+            <div class="text-xs">
+                <span class="block text-rust font-semibold uppercase tracking-wider">Modo Admin Activo</span>
+                <span class="text-steel font-mono">Administrador Autenticado</span>
+            </div>
         </div>
     </div>
-</div>
 
-            <div class="row g-4 mb-5">
-                <!-- FORMULARIO DE INGRESO: CATEGORÍAS Y PRODUCTOS -->
-                <!-- FORMULARIO DE INGRESO: CATEGORÍAS Y PRODUCTOS -->
-<div class="col-lg-5">
-    <div class="card border border-light-subtle shadow-sm p-4 bg-white h-100 rounded-4">
-        <div class="d-flex align-items-center gap-2 mb-4">
-            <span class="fs-5">👕</span>
-            <h2 class="m-0 text-dark" style="font-size: 1.05rem; font-weight: 700; letter-spacing: -0.3px;">Agregar Prenda al Drop</h2>
-        </div>
-        
-        <!-- MODIFICACIÓN: Se añade el enctype para permitir la subida de archivos físicos -->
-        <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
+    @if(session('success'))
+        <div class="mb-6 p-3 bg-rust/10 border border-rust/20 rounded-soft text-rust text-sm">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm">{{ session('error') }}</div>
+    @endif
 
-            @csrf
-            
-            <!-- Selector de Categorías -->
-            <div class="mb-3">
-                <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">SELECCIONAR CATEGORÍA</label>
-                <div class="input-group">
-                    <select name="categoria" class="form-select bg-light border-light-subtle py-2.5 px-3" style="font-size: 0.85rem; box-shadow: none;" required>
-                        <option value="" selected disabled>Selecciona una categoría...</option>
-                        <option value="Camisas Oversize">Camisas Oversize</option>
-                        <option value="Hoodies">Hoodies</option>
-                        <option value="Gorras">Gorras</option>
-                        <option value="Shorts">Shorts</option>
-                    </select>
-                    <button class="btn btn-outline-secondary border-light-subtle bg-light text-dark px-3" type="button" title="Crear nueva categoría" style="font-size: 0.85rem; font-weight: 600;">+ Nueva</button>
+    @if(isset($editProducto))
+        @php $ep = (array)$editProducto; @endphp
+        <div class="mb-10 bg-white/5 rounded-soft p-6 border border-rust/30">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">✏️</span>
+                    <h2 class="font-bold text-paper text-sm uppercase tracking-wider">Editando: {{ $ep['nombre'] ?? '' }}</h2>
                 </div>
+                <a href="{{ route('admin.panel') }}" class="text-sm text-steel hover:text-paper transition-colors">&larr; Cancelar</a>
             </div>
-
-            <!-- Campos: Nombre y SKU -->
-            <div class="row g-3 mb-3">
-                <div class="col-8">
-                    <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">NOMBRE DEL PRODUCTO</label>
-                    <input type="text" name="nombre" class="form-control bg-light border-light-subtle py-2.5 px-3" placeholder="Ej. Hoodie Oversized Hustle" style="font-size: 0.85rem; box-shadow: none;" required>
+            <form action="{{ route('admin.productos.update', $ep['_id'] ?? $ep['id']) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
+                        <select name="categoria" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                            <option value="Camisas Oversize" {{ ($ep['categoria']??'') === 'Camisas Oversize' ? 'selected' : '' }}>Camisas Oversize</option>
+                            <option value="Hoodies" {{ ($ep['categoria']??'') === 'Hoodies' ? 'selected' : '' }}>Hoodies</option>
+                            <option value="Gorras" {{ ($ep['categoria']??'') === 'Gorras' ? 'selected' : '' }}>Gorras</option>
+                            <option value="Shorts" {{ ($ep['categoria']??'') === 'Shorts' ? 'selected' : '' }}>Shorts</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">SKU</label>
+                        <input type="text" name="sku" value="{{ $ep['sku'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm font-mono uppercase outline-none focus:ring-2 focus:ring-rust/30" required>
+                    </div>
                 </div>
-                <div class="col-4">
-                    <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">SKU</label>
-                    <input type="text" name="sku" class="form-control bg-light border-light-subtle py-2.5 px-3 font-monospace text-uppercase" placeholder="HH-HOOD-001" style="font-size: 0.85rem; box-shadow: none;" required>
-                </div>
-            </div>
-
-            <!-- Campos: Precios -->
-            <div class="row g-3 mb-3">
-                <div class="col-6">
-                    <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">PRECIO PÚBLICO ($)</label>
-                    <input type="number" name="precio" step="0.01" class="form-control bg-light border-light-subtle py-2.5 px-3 fw-semibold text-dark" placeholder="00.00" style="font-size: 0.85rem; box-shadow: none;" required>
-                </div>
-                <div class="col-6">
-                    <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">COSTO DE FÁBRICA ($)</label>
-                    <input type="number" name="costo" step="0.01" class="form-control bg-light border-light-subtle py-2.5 px-3 text-secondary" placeholder="00.00" style="font-size: 0.85rem; box-shadow: none;" required>
-                </div>
-            </div>
-
-            <!-- MODIFICACIÓN: Cambio de tipo texto a tipo archivo (File Input) -->
-            <div class="mb-4">
-                <label class="form-label text-secondary fw-bold text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">SUBIR IMAGEN DEL PRODUCTO</label>
-                <input type="file" name="imagen" class="form-control bg-light border-light-subtle py-2 px-3 text-secondary" accept="image/*" style="font-size: 0.85rem; box-shadow: none;" required>
-                <div class="form-text text-muted" style="font-size: 0.72rem;">Sube un archivo de tu equipo (PNG, JPG, WEBP).</div>
-            </div>
-
-            <!-- Botón Enviar -->
-            <button type="submit" class="btn btn-dark w-100 py-3 rounded-3 fw-bold text-uppercase border-0 shadow-sm" style="background: #000; font-size: 0.85rem; letter-spacing: 0.8px;">
-                Publicar Prenda Oficial
-            </button>
-        </form>
-    </div>
-</div>
-
-
-                <!-- TABLA: GESTIÓN AVANZADA DE USUARIOS (MongoDB) -->
-                <div class="col-lg-7">
-    <div class="card border border-light-subtle shadow-sm p-4 bg-white h-100 rounded-4">
-        
-        <!-- ENCABEZADO DE SECCIÓN CON BUSCADOR -->
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
-            <div class="d-flex align-items-center gap-2">
-                <span class="fs-5">👥</span>
                 <div>
-                    <h2 class="m-0 text-dark" style="font-size: 1.05rem; font-weight: 700; letter-spacing: -0.3px;">Usuarios Registrados</h2>
-                    <!-- CÓDIGO BLINDADO (No se rompe si es null) -->
-                    <small class="text-muted" style="font-size: 0.75rem;">
+                    <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nombre del Producto</label>
+                    <input type="text" name="nombre" value="{{ $ep['nombre'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Precio ($)</label>
+                        <input type="number" name="precio" step="0.01" value="{{ $ep['precio'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Costo ($)</label>
+                        <input type="number" name="costo" step="0.01" value="{{ $ep['costo'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nueva Imagen (opcional)</label>
+                    <input type="file" name="imagen" accept="image/*" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-paper file:text-ink file:text-xs file:font-semibold hover:file:bg-rust hover:file:text-paper transition-colors">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <a href="{{ route('admin.panel') }}" class="px-6 py-2.5 border border-white/10 text-steel text-sm font-semibold rounded-full hover:bg-white/10 transition-colors">Cancelar</a>
+                    <button type="submit" class="px-6 py-2.5 bg-rust text-paper text-sm font-semibold uppercase tracking-wider rounded-full hover:bg-rust-deep transition-colors cursor-pointer">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    @endif
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-10">
+        <div class="lg:col-span-2">
+            <div class="bg-white/5 rounded-soft p-6">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="text-lg">👕</span>
+                    <h2 class="font-bold text-paper text-sm uppercase tracking-wider">Agregar Prenda al Drop</h2>
+                </div>
+
+                <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
+                        <select name="categoria" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                            <option value="" selected disabled>Selecciona...</option>
+                            <option value="Camisas Oversize">Camisas Oversize</option>
+                            <option value="Hoodies">Hoodies</option>
+                            <option value="Gorras">Gorras</option>
+                            <option value="Shorts">Shorts</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nombre del Producto</label>
+                        <input type="text" name="nombre" class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" placeholder="Ej. Hoodie Oversized Hustle" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">SKU</label>
+                            <input type="text" name="sku" class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-3 py-2.5 text-sm font-mono uppercase outline-none focus:ring-2 focus:ring-rust/30" placeholder="HH-001" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Precio ($)</label>
+                            <input type="number" name="precio" step="0.01" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Costo ($)</label>
+                            <input type="number" name="costo" step="0.01" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Subir Imagen</label>
+                            <input type="file" name="imagen" accept="image/*" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-paper file:text-ink file:text-xs file:font-semibold hover:file:bg-rust hover:file:text-paper transition-colors" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200 cursor-pointer">
+                        Publicar Prenda Oficial
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3">
+            <div class="bg-white/5 rounded-soft p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📦</span>
+                        <div>
+                            <h2 class="font-bold text-paper text-sm uppercase tracking-wider">Inventario de Productos</h2>
+                            <small class="text-steel text-xs">{{ isset($productos) ? count($productos).' prendas en total' : 'Sin datos' }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto" style="max-height: 420px; overflow-y: auto;">
+                    <table class="w-full text-sm">
+                        <thead class="sticky top-0 bg-ink z-10">
+                            <tr class="border-b border-white/5">
+                                <th class="text-left text-xs font-medium text-steel uppercase tracking-wider pb-3 pr-2">Producto</th>
+                                <th class="text-left text-xs font-medium text-steel uppercase tracking-wider pb-3 px-2">SKU</th>
+                                <th class="text-right text-xs font-medium text-steel uppercase tracking-wider pb-3 px-2">Precio</th>
+                                <th class="text-center text-xs font-medium text-steel uppercase tracking-wider pb-3 px-2">Estado</th>
+                                <th class="text-center text-xs font-medium text-steel uppercase tracking-wider pb-3 pl-2">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($productos as $prod)
+                                @php $p = (array)$prod; @endphp
+                                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors {{ ($p['vendido'] ?? false) ? 'opacity-40' : '' }}">
+                                    <td class="py-3 pr-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 shrink-0 bg-concrete/5 rounded overflow-hidden">
+                                                <img src="{{ asset($p['imagen_path'] ?? 'uploads/products/default.jpg') }}" alt="" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="min-w-0">
+                                                <span class="block font-medium text-paper text-xs truncate max-w-32">{{ $p['nombre'] ?? '' }}</span>
+                                                <span class="text-steel text-xs">{{ $p['categoria'] ?? '' }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-steel text-xs font-mono px-2 py-3">{{ $p['sku'] ?? '' }}</td>
+                                    <td class="text-right text-paper font-semibold text-xs px-2 py-3">${{ number_format($p['precio'] ?? 0, 2) }}</td>
+                                    <td class="text-center px-2 py-3">
+                                        @if($p['vendido'] ?? false)
+                                            <span class="inline-block px-2 py-0.5 bg-green-500/10 text-green-400 text-xs font-semibold rounded-full">Vendido</span>
+                                        @else
+                                            <span class="inline-block px-2 py-0.5 bg-white/10 text-steel text-xs font-semibold rounded-full">Disponible</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 pl-2">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <a href="{{ route('admin.productos.edit', $p['_id'] ?? $p['id']) }}" class="px-2.5 py-1.5 border border-white/10 text-steel text-xs rounded-soft hover:bg-white/10 transition-colors">✏️</a>
+                                            <form action="{{ route('admin.productos.vendido', $p['_id'] ?? $p['id']) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="px-2.5 py-1.5 border border-white/10 text-xs rounded-soft hover:bg-white/10 transition-colors cursor-pointer {{ ($p['vendido'] ?? false) ? 'text-green-400 border-green-500/30' : 'text-steel' }}">💵</button>
+                                            </form>
+                                            <form action="{{ route('admin.productos.destroy', $p['_id'] ?? $p['id']) }}" method="POST" onsubmit="return confirm('¿Eliminar permanentemente {{ addslashes($p['nombre'] ?? '') }}?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="px-2.5 py-1.5 border border-red-500/20 text-red-400 text-xs rounded-soft hover:bg-red-500/10 transition-colors cursor-pointer">🗑️</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-12 text-steel">
+                                        <span class="text-2xl block mb-2">📦</span>
+                                        <p class="text-sm">No hay productos en el inventario.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white/5 rounded-soft p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+                <span class="text-lg">👥</span>
+                <div>
+                    <h2 class="font-bold text-paper text-sm uppercase tracking-wider">Usuarios Registrados</h2>
+                    <small class="text-steel text-xs">
                         @if(isset($usuarios))
                             {{ count($usuarios) }} {{ count($usuarios) == 1 ? 'usuario registrado' : 'usuarios en total' }}
                         @else
                             Control de cuentas activo
                         @endif
                     </small>
-
                 </div>
             </div>
-            <!-- Buscador dinámico -->
-            <div class="position-relative w-100 w-sm-auto">
-                <input type="text" id="userSearch" class="form-control bg-light border-light-subtle py-2 px-3 ps-5" placeholder="Buscar usuario o correo..." style="font-size: 0.82rem; box-shadow: none; border-radius: 8px;">
-                <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-secondary" style="font-size: 0.85rem;">🔍</span>
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="userSearch" placeholder="Buscar usuario o correo..." class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/30">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-steel text-sm">🔍</span>
             </div>
         </div>
-        
-        <!-- CONTENEDOR LIMITADO CON SCROLL: Evita que la tabla crezca infinitamente -->
-        <div class="table-responsive" style="max-height: 420px; overflow-y: auto; scrollbar-width: thin;">
-            <table class="table table-hover align-middle mb-0" id="userTable">
-                <thead class="position-sticky top-0 bg-white" style="z-index: 2; box-shadow: 0 1px 0 #dee2e6;">
-                    <tr>
-                        <th class="text-secondary fw-bold border-0 pb-3" style="font-size: 0.68rem; letter-spacing: 0.5px; width: 40%;">USUARIO / CORREO</th>
-                        <th class="text-secondary fw-bold border-0 pb-3 text-center" style="font-size: 0.68rem; letter-spacing: 0.5px; width: 15%;">ROL</th>
-                        <th class="text-secondary fw-bold border-0 pb-3" style="font-size: 0.68rem; letter-spacing: 0.5px; width: 20%;">REGISTRO</th>
-                        <th class="text-secondary fw-bold border-0 pb-3 text-center" style="font-size: 0.68rem; letter-spacing: 0.5px; width: 25%;">ACCIONES DE CONTROL</th>
+        <div class="overflow-x-auto" style="max-height: 360px; overflow-y: auto;">
+            <table class="w-full text-sm" id="userTable">
+                <thead class="sticky top-0 bg-ink z-10">
+                    <tr class="border-b border-white/5">
+                        <th class="text-left text-xs font-medium text-steel uppercase tracking-wider pb-3 pr-4">Usuario / Correo</th>
+                        <th class="text-center text-xs font-medium text-steel uppercase tracking-wider pb-3 px-4">Rol</th>
+                        <th class="text-left text-xs font-medium text-steel uppercase tracking-wider pb-3 px-4">Registro</th>
+                        <th class="text-center text-xs font-medium text-steel uppercase tracking-wider pb-3 pl-4">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="border-0" style="font-size: 0.85rem;">
-                    
+                <tbody>
                     @forelse($usuarios as $usuario)
-                        @php
-                            // Aseguramos formato array por compatibilidad con colecciones NoSQL directas
-                            $userArr = (array)$usuario;
-                        @endphp
-                        
-                        <tr class="user-row border-bottom border-light-subtle">
-                            <!-- Nombre y Correo Reales de DB -->
-                            <td class="py-3">
-                                <span class="d-block fw-semibold text-dark mb-0.5 search-target">{{ $userArr['nombre'] ?? 'Sin Nombre' }}</span>
-                                <small class="text-muted font-monospace search-target" style="font-size: 0.72rem;">{{ $userArr['email'] ?? 'sin-correo' }}</small>
+                        @php $userArr = (array)$usuario; @endphp
+                        <tr class="user-row border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="py-3 pr-4">
+                                <span class="block font-medium text-paper search-target">{{ $userArr['nombre'] ?? 'Sin Nombre' }}</span>
+                                <small class="text-steel font-mono search-target" style="font-size: 0.7rem;">{{ $userArr['email'] ?? 'sin-correo' }}</small>
                             </td>
-                            
-                            <!-- Rol Dinámico Real de DB -->
-                            <td class="text-center py-3">
+                            <td class="text-center py-3 px-4">
                                 @if(($userArr['rol'] ?? 'cliente') === 'admin')
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 0.65rem; font-weight: 700; border-radius: 5px;">Admin</span>
+                                    <span class="inline-block px-2 py-1 bg-rust/20 text-rust text-xs font-bold rounded-soft">Admin</span>
                                 @else
-                                    <span class="badge bg-dark-subtle text-dark border border-dark-subtle px-2 py-1" style="font-size: 0.65rem; font-weight: 700; border-radius: 5px;">Cliente</span>
+                                    <span class="inline-block px-2 py-1 bg-white/10 text-steel text-xs font-bold rounded-soft">Cliente</span>
                                 @endif
                             </td>
-                            
-                            <!-- Fecha de Registro Real de DB -->
-                            <td class="text-secondary py-3" style="font-size: 0.8rem;">
+                            <td class="text-steel py-3 px-4 text-xs">
                                 @if(isset($userArr['fecha_creacion']))
                                     {{ \Carbon\Carbon::parse($userArr['fecha_creacion'])->format('d M Y') }}
                                 @else
                                     Sin Fecha
                                 @endif
                             </td>
-                            
-                            <!-- Acciones Dinámicas Seguras -->
-                            <td class="py-3">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <a href="#" class="btn btn-light btn-sm border-light-subtle rounded-2 text-dark px-2.5 py-1 fw-semibold transition-all hover-black" style="font-size: 0.75rem;">
-                                        📊 Movimientos
-                                    </a>
-
-                                    @if(($userArr['rol'] ?? 'cliente') === 'admin')
-                                        <!-- Blindaje: Bloquear eliminación de administradores -->
-                                        <button class="btn btn-light btn-sm border-0 text-muted px-2 py-1" disabled title="No puedes eliminar a un Administrador">
-                                            ❌
-                                        </button>
-                                    @else
-                                        <!-- Formulario de borrado seguro mapeando el ID único de MongoDB -->
-                                        <form action="{{ route('admin.users.destroy', $usuario->_id ?? $userArr['_id'] ?? $usuario->id) }}" method="POST" onsubmit="return confirm('¿Estás 100% seguro de eliminar permanentemente a este cliente?')">
-
+                            <td class="py-3 pl-4">
+                                <div class="flex justify-center gap-2">
+                                    @if(($userArr['rol'] ?? 'cliente') !== 'admin')
+                                        <form action="{{ route('admin.users.destroy', $usuario->_id ?? $userArr['_id'] ?? $usuario->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar permanentemente a este cliente?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 border-light-subtle bg-light text-danger px-2.5 py-1 fw-semibold transition-all hover-danger" style="font-size: 0.75rem;">
-                                                ❌ Eliminar
-                                            </button>
+                                            <button type="submit" class="px-3 py-1.5 border border-red-500/20 text-red-400 text-xs font-medium rounded-soft hover:bg-red-500/10 transition-colors cursor-pointer">❌ Eliminar</button>
                                         </form>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <!-- Estado vacío real si la DB no tiene registros -->
                         <tr>
-                            <td colspan="4" class="text-center py-5 text-secondary">
-                                <div class="fs-4 mb-2">👥</div>
-                                <p class="m-0 small fw-medium text-dark">No hay usuarios registrados en la base de datos.</p>
+                            <td colspan="4" class="text-center py-12 text-steel">
+                                <span class="text-2xl block mb-2">👥</span>
+                                <p class="text-sm">No hay usuarios registrados en la base de datos.</p>
                             </td>
                         </tr>
                     @endforelse
-                    
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-        </main>
-        <footer>
-            <!-- place footer here -->
-        </footer>
-        <!-- Bootstrap JavaScript Bundle (includes Popper) -->
-         <script>
-    // 1. Buscador en tiempo real
-    document.getElementById('userSearch').addEventListener('keyup', function() {
+<script>
+    document.getElementById('userSearch')?.addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
-        let rows = document.querySelectorAll('.user-row');
-        
-        rows.forEach(row => {
-            let text = row.innerText.toLowerCase();
-            if(text.includes(filter)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+        document.querySelectorAll('.user-row').forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(filter) ? '' : 'none';
         });
     });
-
-    // 2. Confirmación básica antes de disparar el backend
-    function confirmarEliminacion(nombreUsuario) {
-        if (confirm(`¿Estás seguro de que deseas eliminar permanentemente a "${nombreUsuario}" de la base de datos de Hustle House? Esta acción no se puede deshacer.`)) {
-            alert('Llamando a la ruta de eliminación en Laravel...');
-            // Aquí puedes enviar un formulario oculto de borrado mediante JS
-        }
-    }
 </script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"
-        ></script>
-    </body>
-</html>
+@endsection

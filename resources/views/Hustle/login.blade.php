@@ -1,252 +1,119 @@
-<!doctype html>
-<html lang="es" data-bs-theme="light">
-    <head>
-        <title>Login</title>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+@extends('layouts.app')
 
-        <!-- Bootstrap CSS v5.3.8 -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-            crossorigin="anonymous"
-        />
-        <style>
-            body {
-                background-color: #0b0b0b;
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-            .fw-black { font-weight: 900; }
-            
-            /* Contenedor principal de acceso */
-            .auth-container {
-                max-width: 950px;
-                background-color: #121212;
-                border: 1px solid #222;
-                border-radius: 24px;
-                overflow: hidden;
-            }
+@section('title', 'Entrar — HUSTLE HOUSE')
 
-            /* Estilos de los campos de texto urbanos */
-            .form-control-dark {
-                background-color: #1a1a1a !important;
-                border: 1px solid #333 !important;
-                color: #ffffff !important;
-                padding: 12px 16px;
-                border-radius: 12px;
-                transition: all 0.3s ease;
-            }
-            .form-control-dark:focus {
-                border-color: #ffffff !important;
-                box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
-            }
-            .form-control-dark::placeholder {
-                color: #555555;
-            }
-
-            /* Animaciones de desvanecimiento dinámico */
-            .auth-fade {
-                transition: opacity 0.3s ease, transform 0.3s ease;
-            }
-            .d-none-auth {
-                display: none;
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            /* Imagen lateral con filtro de marca */
-            .auth-sidebar-img {
-                background-image: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2)), url('https://unsplash.com');
-                background-size: cover;
-                background-position: center;
-                min-height: 450px;
-            }
-        </style>
-    </head>
-
-    <body>
-        <header>
-            <!-- place navbar here -->
-             @include('Hustle.menu')
-        </header>
-        <main class="container my-auto py-5 flex-grow-1 d-flex align-items-center justify-content-center">
-    <div class="row auth-container w-100 shadow-lg g-0">
-        
-        <!-- COLUMNA IZQUIERDA: Arte / Branding de la marca -->
-        <div class="col-md-6 d-none d-md-flex flex-column justify-content-end p-5 auth-sidebar-img position-relative">
-            <div class="position-relative z-1 text-white">
-                <span class="badge bg-white text-black mb-2 rounded-pill px-3 fw-bold">DROP 01</span>
-                <h2 class="fw-black text-uppercase tracking-wide m-0 fs-1">HUSTLE HOUSE</h2>
-                <p class="text-white-50 small m-0">Únete a la cultura urbana. Rastrea tus pedidos y obtén acceso exclusivo a drops limitados.</p>
+@section('content')
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div class="hidden lg:flex flex-col items-center justify-center animate-fade-in">
+            <div class="w-72 h-72 text-rust/80">
+                <img src="{{ asset('img/logo-detailed.svg') }}" alt="Hustle House" class="w-full h-full">
             </div>
+            <span class="font-display text-5xl uppercase text-paper/10 -mt-8 tracking-[0.3em]">Hustle House</span>
         </div>
 
-        <!-- COLUMNA DERECHA: Formularios Interactivos -->
-        <div class="col-md-6 p-4 p-sm-5 d-flex flex-column justify-content-center bg-black">
-            
-            <!-- ALERTA DE ERRORES GLOBAL -->
+        <div class="max-w-md mx-auto w-full">
+            <div class="text-center mb-8 lg:hidden">
+                <div class="w-16 h-16 mx-auto mb-4 animate-fade-in">
+                    <img src="{{ asset('img/logo-detailed.svg') }}" alt="Hustle House" class="w-full h-full">
+                </div>
+            </div>
+            <h1 class="font-display text-4xl uppercase text-paper animate-fade-in text-center lg:text-left" style="animation-delay: 150ms; animation-fill-mode: backwards;">Bienvenido</h1>
+
             @if ($errors->any())
-                <div class="alert alert-danger bg-dark text-danger border-danger small py-2 mb-3 rounded-3">
-                    <ul class="m-0 ps-3">
+                <div class="mt-6 mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm animate-fade-in" style="animation-delay: 200ms; animation-fill-mode: backwards;">
+                    <ul class="list-disc list-inside">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
-            
-            <!-- ================= FORMULARIO 1: INICIAR SESIÓN ================= -->
-            <div id="loginForm" class="auth-fade">
-                <div class="mb-4">
-                    <h3 class="text-white fw-black text-uppercase tracking-tight m-0">Bienvenido de vuelta</h3>
-                    <p class="text-muted small">Ingresa tus credenciales urbanas.</p>
-                </div>
 
-                <form action="{{ route('login.post') }}" method="POST">
+            <div id="loginForm" class="mt-8 animate-fade-in" style="animation-delay: 250ms; animation-fill-mode: backwards;">
+                <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label text-white-50 small fw-bold uppercase">Email</label>
-                        <input type="email" name="email" class="form-control form-control-dark" value="{{ old('email') }}" placeholder="tu@email.com" required>
+                    <div>
+                        <label class="block text-sm font-medium text-steel mb-1.5">Email</label>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="tu@email.com" required
+                               class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                     </div>
-                    
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between">
-                            <label class="form-label text-white-50 small fw-bold">Contraseña</label>
-                            <a href="#" class="text-muted small text-decoration-none hover-light">¿La olvidaste?</a>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-sm font-medium text-steel">Contraseña</label>
+                            <a href="#" class="text-xs text-steel hover:text-paper transition-colors">¿Olvidaste?</a>
                         </div>
-                        <div class="input-group">
-                            <input type="password" id="loginPassword" name="password" class="form-control form-control-dark border-end-0" placeholder="••••••••" required>
-                            <button class="btn btn-dark border-secondary border-start-0 text-white-50 px-3" type="button" onclick="togglePasswordVisibility('loginPassword', this)">
-                                👁️
-                            </button>
+                        <div class="relative">
+                            <input type="password" id="loginPassword" name="password" placeholder="••••••••" required
+                                   class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all pr-12">
+                            <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-steel hover:text-paper text-sm cursor-pointer">👁️</button>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-light w-100 py-3 rounded-3 fw-bold text-uppercase tracking-wider mb-4 shadow">
+                    <button type="submit" class="w-full py-3.5 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200">
                         Entrar a la Casa
                     </button>
                 </form>
 
-                <div class="text-center">
-                    <p class="text-muted small m-0">¿No tienes una cuenta aún?</p>
-                    <button onclick="toggleAuthView('register')" class="btn btn-link text-white fw-bold text-decoration-none p-0 small mt-1">
-                        Registrarse / Crear Cuenta &rarr;
-                    </button>
-                </div>
+                <p class="text-center text-steel text-sm mt-6">
+                    ¿No tienes cuenta?
+                    <button onclick="toggleAuth('register')" class="text-paper font-semibold hover:text-rust transition-colors cursor-pointer">Registrarse</button>
+                </p>
             </div>
 
-            <!-- ================= FORMULARIO 2: REGISTRARSE ================= -->
-            <div id="registerForm" class="auth-fade d-none-auth">
-                <div class="mb-4">
-                    <h3 class="text-white fw-black text-uppercase tracking-tight m-0">Crear Cuenta</h3>
-                    <p class="text-muted small">Regístrate para comprar y revisar tus pedidos.</p>
-                </div>
-
-                <form action="{{ route('registro.post') }}" method="POST">
+            <div id="registerForm" class="hidden mt-8 animate-fade-in" style="animation-delay: 250ms; animation-fill-mode: backwards;">
+                <form action="{{ route('registro.post') }}" method="POST" class="space-y-5">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label text-white-50 small fw-bold">Nombre Completo</label>
-                        <input type="text" name="nombre" class="form-control form-control-dark" value="{{ old('nombre') }}" placeholder="Tu Nombre" required>
+                    <div>
+                        <label class="block text-sm font-medium text-steel mb-1.5">Nombre Completo</label>
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Tu Nombre" required
+                               class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label text-white-50 small fw-bold">Correo Electrónico</label>
-                        <input type="email" name="email" class="form-control form-control-dark" value="{{ old('email') }}" placeholder="nombre@ejemplo.com" required>
+                    <div>
+                        <label class="block text-sm font-medium text-steel mb-1.5">Correo Electrónico</label>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="nombre@ejemplo.com" required
+                               class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                     </div>
-                    
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <label class="form-label text-white-50 small fw-bold">Contraseña</label>
-                            <div class="input-group">
-                                <input type="password" id="registerPassword" name="password" class="form-control form-control-dark border-end-0" placeholder="••••••••" required>
-                                <button class="btn btn-dark border-secondary border-start-0 text-white-50 px-2" type="button" onclick="togglePasswordVisibility('registerPassword', this)">
-                                    👁️
-                                </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-steel mb-1.5">Contraseña</label>
+                            <div class="relative">
+                                <input type="password" id="registerPassword" name="password" placeholder="••••••••" required
+                                       class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all pr-10">
+                                <button type="button" onclick="togglePassword('registerPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-steel hover:text-paper text-sm cursor-pointer">👁️</button>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label text-white-50 small fw-bold">Confirmar</label>
-                            <div class="input-group">
-                                <input type="password" id="confirmPassword" name="password_confirmation" class="form-control form-control-dark border-end-0" placeholder="••••••••" required>
-                                <button class="btn btn-dark border-secondary border-start-0 text-white-50 px-2" type="button" onclick="togglePasswordVisibility('confirmPassword', this)">
-                                    👁️
-                                </button>
+                        <div>
+                            <label class="block text-sm font-medium text-steel mb-1.5">Confirmar</label>
+                            <div class="relative">
+                                <input type="password" id="confirmPassword" name="password_confirmation" placeholder="••••••••" required
+                                       class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all pr-10">
+                                <button type="button" onclick="togglePassword('confirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-steel hover:text-paper text-sm cursor-pointer">👁️</button>
                             </div>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-light w-100 py-3 rounded-3 fw-bold text-uppercase tracking-wider mb-4 shadow">
+                    <button type="submit" class="w-full py-3.5 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200">
                         Registrarse Ahora
                     </button>
                 </form>
 
-                <div class="text-center">
-                    <p class="text-muted small m-0">¿Ya formas parte de la comunidad?</p>
-                    <button onclick="toggleAuthView('login')" class="btn btn-link text-white fw-bold text-decoration-none p-0 small mt-1">
-                        &larr; Volver al Login
-                    </button>
-                </div>
+                <p class="text-center text-steel text-sm mt-6">
+                    ¿Ya formas parte?
+                    <button onclick="toggleAuth('login')" class="text-paper font-semibold hover:text-rust transition-colors cursor-pointer">&larr; Volver al Login</button>
+                </p>
             </div>
-
         </div>
     </div>
-</main>
-
-    <footer>
-        <!-- place footer here -->
-
-    </footer>
+</div>
 
 <script>
-function toggleAuthView(view) {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    
-    if (view === 'register') {
-        loginForm.classList.add('d-none');
-        registerForm.classList.remove('d-none-auth', 'd-none');
-    } else {
-        registerForm.classList.add('d-none');
-        loginForm.classList.remove('d-none');
-    }
+function toggleAuth(view) {
+    document.getElementById('loginForm').classList.toggle('hidden', view !== 'login');
+    document.getElementById('registerForm').classList.toggle('hidden', view !== 'register');
 }
-
-function togglePasswordVisibility(inputId, button) {
-    const passwordInput = document.getElementById(inputId);
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        button.innerHTML = "🙈";
-    } else {
-        passwordInput.type = "password";
-        button.innerHTML = "👁️";
-    }
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.innerHTML = input.type === 'password' ? '👁️' : '🙈';
 }
 </script>
-
-
-<style>
-    /* Corrección estética para integrar el botón del ojo sin cortes visuales */
-    .input-group .form-control-dark {
-        border-top-right-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-    }
-    .input-group .btn {
-        border-top-left-radius: 0 !important;
-        border-bottom-left-radius: 0 !important;
-        transition: background-color 0.2s;
-    }
-    .input-group .btn:hover {
-        background-color: #212529 !important;
-        color: #fff !important;
-    }
-</style>
-
-
-
-    </body>
-</html>
+@endsection
