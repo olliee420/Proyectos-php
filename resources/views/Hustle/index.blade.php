@@ -1,155 +1,86 @@
-<!doctype html>
-<html lang="es" data-bs-theme="light">
-    <head>
-        <title>HUSTLE HOUSE</title>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+@extends('layouts.app')
 
-        <!-- Bootstrap CSS v5.3.8 -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-            crossorigin="anonymous"
-        />
-         <style>
-            /* Ajuste para que las imágenes se vean COMPLETAS sin recortes */
-            .carousel-item img {
-                height: 65vh;
-                object-fit: contain;
-                background-color: #ffffff; /* Fondo blanco limpio para la ropa */
-            }
-            body {
-                background-color: #f8f9fa;
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-            }
-            .fw-black { font-weight: 900; }
-            
-            /* Animación suave para las tarjetas de categorías */
-            .category-card {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                cursor: pointer;
-            }
-            .category-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-            }
-        </style>
-    </head>
+@section('title', 'HUSTLE HOUSE — Drop 01')
 
-    <body>
-        <header>
-            <!-- place navbar here -->
-             @include('Hustle.menu')
-        </header>
+@section('content')
+<div class="relative min-h-screen flex flex-col">
+    <section class="relative h-[80vh] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] flex items-end overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent z-10"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] text-white/5 z-[1]">
+            <img src="{{ asset('img/logo-detailed.svg') }}" alt="" class="w-full h-full opacity-40">
+        </div>
+        <img src="{{ asset('imagenes/1_c1eFJH.webp') }}" alt="Drop 01" class="absolute inset-0 w-full h-full object-cover">
+        <div class="relative z-20 max-w-7xl mx-auto px-4 lg:px-8 pb-16 lg:pb-24 w-full">
+            <span class="text-rust font-semibold text-sm uppercase tracking-[0.2em]">Drop 01 — Limitado</span>
+            <h1 class="font-display text-5xl sm:text-7xl lg:text-[8rem] leading-[0.85] text-paper mt-2 max-w-4xl uppercase">
+                Oversize<br>Tee
+            </h1>
+            <p class="text-paper/60 text-base mt-4 max-w-md">100% algodón premium de 240 gramos. Corte holgado. Hecho para durar.</p>
+            <a href="{{ route('catalogo') }}" class="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-300">
+                Comprar Ahora
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </section>
 
-
-        <main class="container my-5">
-            <!-- SECCIÓN 1: Carrusel de Productos Limpio y Destacado -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-lg-10">
-                    <div id="carouselHustleHouse" class="carousel slide shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
-                        
-                        <!-- Indicadores inferiores -->
-                        <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#carouselHustleHouse" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                            <button type="button" data-bs-target="#carouselHustleHouse" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                            <button type="button" data-bs-target="#carouselHustleHouse" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                        </div>
-
-                        <!-- Fotos completas del Carrusel -->
-                        <div class="carousel-inner">
-                            <!-- Foto 1 -->
-                            <div class="carousel-item active">
-                                <img src="{{ asset('imagenes/1_c1eFJH.webp') }}" class="d-block w-100" alt="Camiseta Oversize Negra Frontal">
-                                <div class="carousel-caption d-none d-md-block bg-black bg-opacity-75 rounded-4 p-3 mb-3 mx-auto" style="max-width: 80%;">
-                                    <h5 class="fw-bold tracking-wide m-0">DROP 01: OVERSIZE TEE</h5>
-                                    <p class="small text-white-50 m-0">100% Algodón Premium de 240 gramos.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Foto 2 -->
-                            <div class="carousel-item">
-                                <img src="{{ asset('imagenes/foto2.jpg') }}" class="d-block w-100" alt="Camiseta Oversize Blanca">
-                                <div class="carousel-caption d-none d-md-block bg-black bg-opacity-75 rounded-4 p-3 mb-3 mx-auto" style="max-width: 80%;">
-                                    <h5 class="fw-bold tracking-wide m-0">ESTILO URBANO MINIMALISTA</h5>
-                                    <p class="small text-white-50 m-0">Diseño holgado hecho para el confort diario.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Foto 3 -->
-                            <div class="carousel-item">
-                                <img src="{{ asset('imagenes/foto3.avif') }}" class="d-block w-100" alt="Detalle Streetwear">
-                                <div class="carousel-caption d-none d-md-block bg-black bg-opacity-75 rounded-4 p-3 mb-3 mx-auto" style="max-width: 80%;">
-                                    <h5 class="fw-bold tracking-wide m-0">COLECCIÓN COMPLETA</h5>
-                                    <p class="small text-white-50 m-0">Combina tus outfits urbanos con lo último de nuestra casa.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Flechas Laterales de Navegación Estilizadas -->
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselHustleHouse" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon bg-black p-3 rounded-circle" aria-hidden="true"></span>
-                            <span class="visually-hidden">Anterior</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselHustleHouse" data-bs-slide="next">
-                            <span class="carousel-control-next-icon bg-black p-3 rounded-circle" aria-hidden="true"></span>
-                            <span class="visually-hidden">Siguiente</span>
-                        </button>
-                    </div>
-                </div>
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-24 w-full">
+        <div class="flex items-center justify-between mb-12">
+            <div>
+                <span class="text-rust font-semibold text-xs uppercase tracking-[0.2em]">Colección</span>
+                <h2 class="font-display text-3xl sm:text-4xl uppercase text-paper mt-1">Drop 01</h2>
             </div>
+            <a href="{{ route('catalogo') }}" class="text-sm font-medium text-steel hover:text-paper transition-colors">Ver todo &rarr;</a>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <div class="aspect-square bg-concrete/5 overflow-hidden group">
+                <img src="{{ asset('imagenes/foto2.jpg') }}" alt="Oversize Blanca" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+            <div class="aspect-square bg-concrete/5 overflow-hidden group">
+                <img src="{{ asset('imagenes/foto3.avif') }}" alt="Streetwear" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+            <div class="aspect-square bg-concrete/5 overflow-hidden group">
+                <img src="{{ asset('imagenes/Hodd-1.jpg') }}" alt="Hoodie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+            <div class="aspect-square bg-concrete/5 overflow-hidden group">
+                <img src="{{ asset('imagenes/Over-1.webp') }}" alt="Over" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+        </div>
+    </section>
 
-            <!-- SECCIÓN 2: Banner de Introducción / Call To Action -->
-            <div class="text-center my-5 py-4">
-                <span class="text-muted text-uppercase tracking-widest small d-block mb-2">Drop 01 — El arte de mantener el ritmo urbano.</span>
-                <h2 class="fw-black text-uppercase display-5 tracking-tight text-dark">VISTE SIN REGLAS. VIVE CON HUSTLE.</h2>
-                <p class="text-secondary col-md-6 mx-auto mb-4">Explora prendas diseñadas con cortes oversize perfectos, materiales pesados de alta durabilidad y estética urbana minimalista.</p>
-                <a href="{{ url('/catalogo') }}" class="btn btn-dark bg-black text-white px-5 py-3 rounded-pill fw-bold text-uppercase tracking-wider shadow-sm">
-                    Ver Catálogo Completo ➔
+    <section class="bg-ink border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8 py-24 w-full text-center">
+            <span class="text-rust font-semibold text-xs uppercase tracking-[0.2em]">Filosofía</span>
+            <h2 class="font-display text-4xl sm:text-5xl uppercase text-paper mt-3 leading-[0.9]">
+                Viste sin reglas.<br>Vive con Hustle.
+            </h2>
+            <p class="text-steel text-base mt-4 max-w-lg mx-auto">Prendas diseñadas con cortes oversize, materiales pesados y estética urbana minimalista. Para los que entienden que el estilo no se pide prestado.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+                <a href="{{ route('catalogo') }}" class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-300">
+                    Explorar Catálogo
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+                <a href="#" class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 border border-white/20 text-paper font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-white/10 transition-all duration-300">
+                    Conocer Más
                 </a>
             </div>
+        </div>
+    </section>
 
-            <hr class="my-5 border-light">
-
-            <!-- SECCIÓN 3: Accesos Rápidos a Categorías -->
-            <div class="row g-4 justify-content-center">
-                <div class="col-6 col-md-4">
-                    <a href="{{ url('/catalogo') }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white category-card">
-                            <div class="fs-1 mb-2">👕</div>
-                            <h6 class="fw-bold text-dark text-uppercase m-0">Playeras</h6>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-md-4">
-                    <a href="{{ url('/catalogo') }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white category-card">
-                            <div class="fs-1 mb-2">🧥</div>
-                            <h6 class="fw-bold text-dark text-uppercase m-0">Sudaderas</h6>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-md-4">
-                    <a href="{{ url('/catalogo') }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white category-card">
-                            <div class="fs-1 mb-2">🧢</div>
-                            <h6 class="fw-bold text-dark text-uppercase m-0">Accesorios</h6>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <footer class="bg-white border-top py-4 text-center text-muted small mt-5">
-            <p class="mb-0">&copy; {{ date('Y') }} HUSTLE HOUSE. Todos los derechos reservados.</p>
-        </footer>
-
-        <script 
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"
-        ></script>
-    </body>
-</html>
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-16 sm:py-24 w-full">
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+            <a href="{{ route('catalogo') }}" class="group flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-8 bg-white/5 rounded-soft hover:bg-white/10 transition-colors">
+                <span class="text-2xl sm:text-3xl">👕</span>
+                <span class="font-semibold text-xs sm:text-sm uppercase tracking-wider text-paper">Playeras</span>
+            </a>
+            <a href="{{ route('catalogo') }}" class="group flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-8 bg-white/5 rounded-soft hover:bg-white/10 transition-colors">
+                <span class="text-2xl sm:text-3xl">🧥</span>
+                <span class="font-semibold text-xs sm:text-sm uppercase tracking-wider text-paper">Sudaderas</span>
+            </a>
+            <a href="{{ route('catalogo') }}" class="group flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-8 bg-white/5 rounded-soft hover:bg-white/10 transition-colors">
+                <span class="text-2xl sm:text-3xl">🧢</span>
+                <span class="font-semibold text-xs sm:text-sm uppercase tracking-wider text-paper">Accesorios</span>
+            </a>
+        </div>
+    </section>
+</div>
+@endsection
