@@ -116,18 +116,29 @@ class HustleController extends Controller
             ->first();
 
         if (!$producto) {
+            $producto = DB::connection('mongodb')->table('products')
+                ->where('id', (int)$request->producto_id)
+                ->first();
+        }
+
+        if (!$producto) {
             return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
         }
 
         $producto = (array) $producto;
+        $productoId = $producto['id'] ?? $producto['_id'] ?? null;
+        if (!$productoId) {
+            return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
+        }
+
         $carrito = $request->session()->get('carrito', []);
-        $cartKey = $producto['_id'] . '_' . $request->talla;
+        $cartKey = $productoId . '_' . $request->talla;
 
         if (isset($carrito[$cartKey])) {
             $carrito[$cartKey]['cantidad']++;
         } else {
             $carrito[$cartKey] = [
-                'id'          => $producto['_id'],
+                'id'          => $productoId,
                 'nombre'      => $producto['nombre'],
                 'precio'      => (float) $producto['precio'],
                 'categoria'   => $producto['categoria'] ?? 'Prenda',
