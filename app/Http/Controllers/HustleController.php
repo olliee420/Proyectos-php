@@ -277,6 +277,19 @@ class HustleController extends Controller
         return view('Hustle.pedidos', compact('pedidos'));
     }
 
+    public function showPedidoDetalle(Request $request, $id)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+        $pedido = DB::connection('mongodb')->table('Pedidos')
+            ->where('_id', (int)$id)
+            ->where('usuario_id', Auth::id())
+            ->first();
+        if (!$pedido) {
+            return redirect()->route('pedidos')->with('error', 'Pedido no encontrado.');
+        }
+        return view('Hustle.pedido-detalle', compact('pedido'));
+    }
+
     // ZONA EXCLUSIVA ADMINISTRADORES
 
     public function showAdminPanel()

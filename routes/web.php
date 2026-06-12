@@ -43,6 +43,7 @@ Route::get('/index', [HustleController::class, 'showIndex'])->name('index');
 // ==========================================
 Route::get('/cliente/carrito', [HustleController::class, 'showCarrito'])->name('carrito');
 Route::get('/cliente/pedidos', [HustleController::class, 'showPedidos'])->name('pedidos');
+Route::get('/cliente/pedidos/{id}', [HustleController::class, 'showPedidoDetalle'])->name('pedidos.detalle');
 
 // Ruta para añadir productos a la bolsa
 Route::post('/carrito/agregar', [HustleController::class, 'agregarAlCarrito'])->name('carrito.agregar');
