@@ -143,11 +143,18 @@ class HustleController extends Controller
     public function showCarrito(Request $request)
     {
         $carrito = $request->session()->get('carrito', []);
+        $descuento = $request->session()->get('descuento');
         $totalEstimado = 0;
         foreach($carrito as $item) {
             $totalEstimado += $item['precio'] * $item['cantidad'];
         }
-        return view('Hustle.carrito', compact('carrito', 'totalEstimado'));
+        $totalFinal = $totalEstimado;
+        $descuentoAplicado = 0;
+        if ($descuento && $descuento['porcentaje'] > 0) {
+            $descuentoAplicado = $totalEstimado * ($descuento['porcentaje'] / 100);
+            $totalFinal = $totalEstimado - $descuentoAplicado;
+        }
+        return view('Hustle.carrito', compact('carrito', 'totalEstimado', 'descuento', 'descuentoAplicado', 'totalFinal'));
     }
 
     public function agregarAlCarrito(Request $request)
@@ -177,10 +184,14 @@ class HustleController extends Controller
             return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
         }
 
+        $esUnico = $producto['unico'] ?? false;
         $carrito = $request->session()->get('carrito', []);
         $cartKey = $productoId . '_' . $request->talla;
 
         if (isset($carrito[$cartKey])) {
+            if ($esUnico) {
+                return redirect()->route('carrito')->with('error', 'Producto único — ya está en tu bolsa.');
+            }
             $carrito[$cartKey]['cantidad']++;
         } else {
             $carrito[$cartKey] = [
@@ -189,6 +200,7 @@ class HustleController extends Controller
                 'precio'      => (float) $producto['precio'],
                 'categoria'   => $producto['categoria'] ?? 'Prenda',
                 'imagen_path' => $producto['imagen_path'] ?? 'uploads/products/default.jpg',
+                'unico'       => $esUnico,
                 'talla'       => $request->talla,
                 'cantidad'    => 1
             ];
@@ -216,7 +228,11 @@ class HustleController extends Controller
         $accion = $request->input('accion');
 
         if ($key && isset($carrito[$key])) {
+            $esUnico = $carrito[$key]['unico'] ?? false;
             if ($accion === 'incrementar') {
+                if ($esUnico) {
+                    return redirect()->route('carrito')->with('error', 'Producto único — solo 1 unidad.');
+                }
                 $carrito[$key]['cantidad']++;
             } elseif ($accion === 'decrementar') {
                 $carrito[$key]['cantidad']--;
@@ -227,6 +243,16 @@ class HustleController extends Controller
             $request->session()->put('carrito', $carrito);
         }
         return redirect()->route('carrito');
+    }
+
+    public function aplicarDescuento(Request $request)
+    {
+        $codigo = strtoupper(trim($request->input('codigo', '')));
+        if ($codigo === 'HHSANTEIN') {
+            $request->session()->put('descuento', ['codigo' => 'HHSANTEIN', 'porcentaje' => 50]);
+            return redirect()->route('carrito')->with('success', '🎉 Descuento HHSANTEIN aplicado: 50% OFF!');
+        }
+        return redirect()->route('carrito')->with('error', 'Código de descuento inválido.');
     }
 
     public function showPedidos(Request $request)
@@ -447,7 +473,15 @@ class HustleController extends Controller
             ->where('_id', (int)Auth::id())
             ->first();
 
-        return view('Hustle.checkout', compact('carrito', 'totalEstimado', 'userData'));
+        $descuento = $request->session()->get('descuento');
+        $totalFinal = $totalEstimado;
+        $descuentoAplicado = 0;
+        if ($descuento && ($descuento['porcentaje'] ?? 0) > 0) {
+            $descuentoAplicado = $totalEstimado * ($descuento['porcentaje'] / 100);
+            $totalFinal = $totalEstimado - $descuentoAplicado;
+        }
+
+        return view('Hustle.checkout', compact('carrito', 'totalEstimado', 'userData', 'descuento', 'descuentoAplicado', 'totalFinal'));
     }
 
     public function procesarPedido(Request $request)
@@ -481,6 +515,16 @@ class HustleController extends Controller
             ];
         }
 
+        $descuento = $request->session()->get('descuento');
+        $totalFinal = $total;
+        $descuentoAplicado = 0;
+        $codigoUsado = null;
+        if ($descuento && ($descuento['porcentaje'] ?? 0) > 0) {
+            $descuentoAplicado = $total * ($descuento['porcentaje'] / 100);
+            $totalFinal = $total - $descuentoAplicado;
+            $codigoUsado = $descuento['codigo'];
+        }
+
         $maxId = DB::connection('mongodb')->table('Pedidos')->max('_id');
         $nuevoId = ($maxId ? (int)$maxId : 0) + 1;
 
@@ -492,7 +536,9 @@ class HustleController extends Controller
             'direccion'       => $request->direccion,
             'notas'           => $request->notas,
             'items'           => $items,
-            'total'           => $total,
+            'total'           => $totalFinal,
+            'descuento'       => $descuentoAplicado > 0 ? $descuentoAplicado : 0,
+            'codigo_descuento'=> $codigoUsado,
             'estado'          => 'Pendiente',
             'fecha_creacion'  => now(),
         ]);
@@ -508,7 +554,10 @@ class HustleController extends Controller
         foreach ($items as $item) {
             $mensaje .= "• {$item['nombre']} ({$item['talla']}) x{$item['cantidad']} - \${$item['subtotal']}\n";
         }
-        $mensaje .= "\n💰 *Total:* \${$total}\n";
+        if ($codigoUsado) {
+            $mensaje .= "\n🎉 *Descuento {$descuento['porcentaje']}% ({$codigoUsado}):* -\${$descuentoAplicado}\n";
+        }
+        $mensaje .= "\n💰 *Total:* \${$totalFinal}\n";
         if ($request->notas) {
             $mensaje .= "\n📝 *Notas:* {$request->notas}\n";
         }
@@ -517,6 +566,7 @@ class HustleController extends Controller
         $whatsappUrl = 'https://wa.me/' . $telefono . '?text=' . urlencode($mensaje);
 
         $request->session()->forget('carrito');
+        $request->session()->forget('descuento');
 
         return redirect()->away($whatsappUrl);
     }

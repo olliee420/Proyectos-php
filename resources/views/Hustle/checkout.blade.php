@@ -73,13 +73,19 @@
                         <span class="text-steel">Subtotal</span>
                         <span class="text-paper">${{ number_format($totalEstimado, 2) }}</span>
                     </div>
+                    @if(isset($descuento) && $descuentoAplicado > 0)
+                    <div class="flex justify-between text-sm">
+                        <span class="text-rust text-xs uppercase tracking-wider font-semibold">Descuento {{ $descuento['porcentaje'] }}%</span>
+                        <span class="text-rust font-semibold">-${{ number_format($descuentoAplicado, 2) }}</span>
+                    </div>
+                    @endif
                     <div class="flex justify-between text-sm">
                         <span class="text-steel">Envío</span>
                         <span class="text-rust font-semibold text-xs uppercase tracking-wider">Gratis</span>
                     </div>
                     <div class="flex justify-between text-base font-bold pt-2 border-t border-white/10">
                         <span class="text-paper">Total</span>
-                        <span class="text-paper">${{ number_format($totalEstimado, 2) }}</span>
+                        <span class="text-paper">${{ number_format($totalFinal, 2) }}</span>
                     </div>
                 </div>
             </div>

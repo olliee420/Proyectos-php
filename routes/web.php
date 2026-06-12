@@ -53,6 +53,9 @@ Route::post('/carrito/eliminar', [HustleController::class, 'eliminarDelCarrito']
 // Ruta para actualizar cantidad
 Route::post('/carrito/actualizar', [HustleController::class, 'actualizarCantidad'])->name('carrito.actualizar');
 
+// Ruta para aplicar descuento
+Route::post('/carrito/descuento', [HustleController::class, 'aplicarDescuento'])->name('carrito.descuento');
+
 // 5. Checkout
 Route::get('/checkout', [HustleController::class, 'showCheckout'])->name('checkout');
 Route::post('/checkout/procesar', [HustleController::class, 'procesarPedido'])->name('checkout.procesar');

@@ -4,6 +4,13 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 lg:px-8 py-12 w-full">
+    @if(session('success'))
+        <div class="mb-6 p-3 bg-rust/10 border border-rust/20 rounded-soft text-rust text-sm">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm">{{ session('error') }}</div>
+    @endif
+
     @if(isset($carrito) && count($carrito) > 0)
         <div class="mb-8">
             <h1 class="font-display text-3xl uppercase text-paper">Bolsa de Compra</h1>
@@ -13,6 +20,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-4">
                 @foreach($carrito as $id => $item)
+                    @php $esUnico = $item['unico'] ?? false; @endphp
                     <div class="flex flex-wrap items-center gap-3 p-3 sm:p-4 bg-white/5 rounded-soft">
                         <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-concrete/5 rounded-soft overflow-hidden">
                             <img src="{{ asset($item['imagen_path'] ?? 'uploads/products/default.jpg') }}" alt="{{ $item['nombre'] }}" class="w-full h-full object-cover">
@@ -20,8 +28,9 @@
                         <div class="flex-1 min-w-0 order-3 sm:order-none w-full sm:w-auto mt-2 sm:mt-0">
                             <span class="text-steel text-xs uppercase tracking-widest font-medium">{{ $item['categoria'] ?? 'Prenda' }}</span>
                             <h3 class="font-semibold text-paper text-sm truncate">{{ $item['nombre'] }}</h3>
-                            <p class="text-steel text-xs">Talla: <span class="text-paper">{{ $item['talla'] ?? 'M' }}</span></p>
+                            <p class="text-steel text-xs">{{ $esUnico ? 'Único' : 'Talla: '.($item['talla'] ?? 'M') }}</p>
                         </div>
+                        @if(!$esUnico)
                         <div class="flex items-center gap-2 bg-white/5 rounded-full px-2 py-1">
                             <form action="{{ route('carrito.actualizar') }}" method="POST">
                                 @csrf
@@ -37,6 +46,11 @@
                                 <button type="submit" class="w-7 h-7 flex items-center justify-center rounded-full bg-paper/10 text-paper text-sm hover:bg-paper/20 transition-colors cursor-pointer">&plus;</button>
                             </form>
                         </div>
+                        @else
+                        <div class="flex items-center gap-2 px-2 py-1">
+                            <span class="text-paper font-semibold text-sm">x1</span>
+                        </div>
+                        @endif
                         <div class="text-right shrink-0 ml-auto">
                             <p class="font-bold text-paper text-sm sm:text-base">${{ number_format($item['precio'] * $item['cantidad'], 2) }}</p>
                             <form action="{{ route('carrito.eliminar') }}" method="POST" onsubmit="return confirm('¿Remover este artículo?')">
@@ -60,22 +74,37 @@
                         <span class="text-steel">Subtotal</span>
                         <span class="text-paper font-semibold">${{ number_format($totalEstimado ?? 0, 2) }}</span>
                     </div>
+                    @if(isset($descuento) && $descuentoAplicado > 0)
+                    <div class="flex justify-between text-sm">
+                        <span class="text-rust text-xs uppercase tracking-wider font-semibold">Descuento {{ $descuento['porcentaje'] }}%</span>
+                        <span class="text-rust font-semibold">-${{ number_format($descuentoAplicado, 2) }}</span>
+                    </div>
+                    @endif
                     <div class="flex justify-between text-sm">
                         <span class="text-steel">Envío estimado</span>
                         <span class="text-rust font-semibold text-xs uppercase tracking-wider">Gratis</span>
                     </div>
-                    <div class="flex gap-2 pt-2">
-                        <input type="text" placeholder="Código de descuento" class="flex-1 bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-rust/30">
-                        <button class="px-4 py-2 bg-paper text-ink text-xs font-semibold rounded-soft hover:bg-rust hover:text-paper transition-colors cursor-pointer">Aplicar</button>
-                    </div>
+                    <form action="{{ route('carrito.descuento') }}" method="POST" class="flex gap-2 pt-2">
+                        @csrf
+                        <input type="text" name="codigo" placeholder="Código de descuento" value="{{ $descuento['codigo'] ?? '' }}"
+                               class="flex-1 bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-rust/30 uppercase">
+                        <button type="submit" class="px-4 py-2 bg-paper text-ink text-xs font-semibold rounded-soft hover:bg-rust hover:text-paper transition-colors cursor-pointer">Aplicar</button>
+                    </form>
                 </div>
                 <div class="flex justify-between items-center mb-6">
-                    <span class="font-semibold text-paper text-sm">Total estimado</span>
-                    <span class="font-bold text-paper text-xl">${{ number_format($totalEstimado ?? 0, 2) }}</span>
+                    <span class="font-semibold text-paper text-sm">Total</span>
+                    <span class="font-bold text-paper text-xl">${{ number_format($totalFinal ?? $totalEstimado ?? 0, 2) }}</span>
                 </div>
                 <a href="{{ route('checkout') }}" class="block w-full py-3.5 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200 text-center">
                     Proceder al Pago &rarr;
                 </a>
+                @if(isset($descuento))
+                <form action="{{ route('carrito.descuento') }}" method="POST" class="mt-3">
+                    @csrf
+                    <input type="hidden" name="codigo" value="">
+                    <button type="submit" class="w-full text-xs text-steel hover:text-red-400 transition-colors cursor-pointer text-center">Quitar descuento</button>
+                </form>
+                @endif
             </div>
         </div>
     @else
@@ -89,4 +118,4 @@
         </div>
     @endif
 </div>
-@endsection
+@endSection
