@@ -46,7 +46,7 @@
                         </div>
                         <div class="min-w-0">
                             <h4 class="font-semibold text-paper text-sm truncate">{{ $primerItem['nombre'] ?? 'Prenda' }}{{ count($p['items'] ?? []) > 1 ? ' + '.(count($p['items']) - 1).' más' : '' }}</h4>
-                            <span class="text-steel text-xs">Pedido #{{ $p['_id'] }}</span>
+                            <span class="text-steel text-xs">Pedido #{{ $p['_id'] ?? $p['id'] ?? 'N/A' }}</span>
                         </div>
                     </div>
                     <span class="font-semibold text-paper text-sm shrink-0">${{ number_format($p['total'] ?? 0, 2) }}</span>

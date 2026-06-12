@@ -26,8 +26,8 @@
                 <span class="text-xs text-steel uppercase tracking-wider block mt-1">{{ $userData->rol ?? 'cliente' }}</span>
                 <div class="mt-6 pt-4 border-t border-white/10 space-y-1 text-left">
                     <a href="#" class="block text-sm text-paper font-semibold px-2 py-1.5 rounded-soft bg-white/5">Mi Cuenta</a>
-                    <a href="{{ url('/pedidos') }}" class="block text-sm text-steel hover:text-paper transition-colors px-2 py-1.5">Mis Pedidos</a>
-                    <a href="{{ url('/carrito') }}" class="block text-sm text-steel hover:text-paper transition-colors px-2 py-1.5">Mi Carrito</a>
+                    <a href="{{ route('pedidos') }}" class="block text-sm text-steel hover:text-paper transition-colors px-2 py-1.5">Mis Pedidos</a>
+                    <a href="{{ route('carrito') }}" class="block text-sm text-steel hover:text-paper transition-colors px-2 py-1.5">Mi Carrito</a>
                 </div>
             </div>
         </div>
