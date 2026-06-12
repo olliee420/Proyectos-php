@@ -256,6 +256,10 @@ class HustleController extends Controller
     public function aplicarDescuento(Request $request)
     {
         $codigo = strtoupper(trim($request->input('codigo', '')));
+        if ($codigo === '') {
+            $request->session()->forget('descuento');
+            return redirect()->route('carrito')->with('success', 'Descuento eliminado.');
+        }
         if ($codigo === 'HHSANTEIN') {
             $request->session()->put('descuento', ['codigo' => 'HHSANTEIN', 'porcentaje' => 50]);
             return redirect()->route('carrito')->with('success', '🎉 Descuento HHSANTEIN aplicado: 50% OFF!');

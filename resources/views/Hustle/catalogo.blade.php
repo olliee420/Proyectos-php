@@ -4,13 +4,19 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 lg:px-8 py-12 w-full">
+    @if(session('success'))
+        <div class="mb-6 p-3 bg-rust/10 border border-rust/20 rounded-soft text-rust text-sm">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm">{{ session('error') }}</div>
+    @endif
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
         <div>
             <span class="text-rust font-semibold text-xs uppercase tracking-[0.2em]">Drop 01</span>
             <h1 class="font-display text-3xl sm:text-4xl uppercase text-paper mt-1">Catálogo</h1>
             <p class="text-steel text-sm mt-1">El arte de mantener el ritmo urbano.</p>
         </div>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
             <a href="{{ route('catalogo') }}"
                class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors {{ !$categoriaActual ? 'bg-paper text-ink' : 'bg-transparent text-steel border border-white/10 hover:border-white/30' }}">
                 Todos
