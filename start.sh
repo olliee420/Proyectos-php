@@ -14,6 +14,17 @@ if ! grep -q "APP_KEY=" .env || [ "$(grep 'APP_KEY=' .env | cut -d= -f2)" = "" ]
     php artisan key:generate --force
 fi
 
+# Ensure Docker-compatible DB settings
+if grep -q '^DB_HOST=' .env; then
+    sed -i 's/^DB_HOST=.*/DB_HOST=mongodb/' .env
+else
+    echo 'DB_HOST=mongodb' >> .env
+fi
+if grep -q '^DB_PORT=' .env; then
+    sed -i 's/^DB_PORT=.*/DB_PORT=27017/' .env
+fi
+echo "🔧 Docker environment configured (DB_HOST=mongodb)"
+
 echo "📦 Installing Composer dependencies..."
 composer install --no-interaction --prefer-dist --no-dev
 
