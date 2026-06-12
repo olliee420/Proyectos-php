@@ -10,10 +10,17 @@
             <h1 class="font-display text-3xl sm:text-4xl uppercase text-paper mt-1">Catálogo</h1>
             <p class="text-steel text-sm mt-1">El arte de mantener el ritmo urbano.</p>
         </div>
-        <div class="flex gap-2">
-            <button class="px-4 py-2 bg-paper text-ink text-xs font-semibold uppercase tracking-wider rounded-full">Todos</button>
-            <button class="px-4 py-2 bg-transparent text-steel text-xs font-semibold uppercase tracking-wider rounded-full border border-white/10 hover:border-white/30 transition-colors">Playeras</button>
-            <button class="px-4 py-2 bg-transparent text-steel text-xs font-semibold uppercase tracking-wider rounded-full border border-white/10 hover:border-white/30 transition-colors">Sudaderas</button>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('catalogo') }}"
+               class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors {{ !$categoriaActual ? 'bg-paper text-ink' : 'bg-transparent text-steel border border-white/10 hover:border-white/30' }}">
+                Todos
+            </a>
+            @foreach(['Camisa','Camiseta','Hoodie','Sweater','Chaqueta','Pantalón','Shorts','Pants','Gorra','Calcetines'] as $cat)
+                <a href="{{ route('catalogo', ['categoria' => $cat]) }}"
+                   class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors {{ $categoriaActual === $cat ? 'bg-paper text-ink' : 'bg-transparent text-steel border border-white/10 hover:border-white/30' }}">
+                    {{ $cat }}
+                </a>
+            @endforeach
         </div>
     </div>
 
@@ -52,10 +59,10 @@
         @empty
             <div class="col-span-2 lg:col-span-4 text-center py-20">
                 <span class="text-4xl block mb-4">👕</span>
-                <h3 class="font-display text-2xl uppercase text-paper">No hay prendas disponibles</h3>
+                <h3 class="font-display text-2xl uppercase text-paper">{{ $categoriaActual ? 'No hay '.$categoriaActual.'s disponibles' : 'No hay prendas disponibles' }}</h3>
                 <p class="text-steel text-sm mt-2">Ve al panel de administración para añadir productos al catálogo.</p>
             </div>
         @endforelse
     </div>
 </div>
-@endsection
+@endSection

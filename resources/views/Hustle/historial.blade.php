@@ -64,10 +64,16 @@
                     <div>
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
                         <select name="categoria" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
-                            <option value="Camisas Oversize" {{ ($ep['categoria']??'') === 'Camisas Oversize' ? 'selected' : '' }}>Camisas Oversize</option>
-                            <option value="Hoodies" {{ ($ep['categoria']??'') === 'Hoodies' ? 'selected' : '' }}>Hoodies</option>
-                            <option value="Gorras" {{ ($ep['categoria']??'') === 'Gorras' ? 'selected' : '' }}>Gorras</option>
+                            <option value="Camisa" {{ ($ep['categoria']??'') === 'Camisa' ? 'selected' : '' }}>Camisa</option>
+                            <option value="Camiseta" {{ ($ep['categoria']??'') === 'Camiseta' ? 'selected' : '' }}>Camiseta</option>
+                            <option value="Hoodie" {{ ($ep['categoria']??'') === 'Hoodie' ? 'selected' : '' }}>Hoodie</option>
+                            <option value="Sweater" {{ ($ep['categoria']??'') === 'Sweater' ? 'selected' : '' }}>Sweater</option>
+                            <option value="Chaqueta" {{ ($ep['categoria']??'') === 'Chaqueta' ? 'selected' : '' }}>Chaqueta</option>
+                            <option value="Pantalón" {{ ($ep['categoria']??'') === 'Pantalón' ? 'selected' : '' }}>Pantalón</option>
                             <option value="Shorts" {{ ($ep['categoria']??'') === 'Shorts' ? 'selected' : '' }}>Shorts</option>
+                            <option value="Pants" {{ ($ep['categoria']??'') === 'Pants' ? 'selected' : '' }}>Pants</option>
+                            <option value="Gorra" {{ ($ep['categoria']??'') === 'Gorra' ? 'selected' : '' }}>Gorra</option>
+                            <option value="Calcetines" {{ ($ep['categoria']??'') === 'Calcetines' ? 'selected' : '' }}>Calcetines</option>
                         </select>
                     </div>
                     <div>
@@ -120,10 +126,16 @@
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
                         <select name="categoria" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                             <option value="" selected disabled>Selecciona...</option>
-                            <option value="Camisas Oversize">Camisas Oversize</option>
-                            <option value="Hoodies">Hoodies</option>
-                            <option value="Gorras">Gorras</option>
+                            <option value="Camisa">Camisa</option>
+                            <option value="Camiseta">Camiseta</option>
+                            <option value="Hoodie">Hoodie</option>
+                            <option value="Sweater">Sweater</option>
+                            <option value="Chaqueta">Chaqueta</option>
+                            <option value="Pantalón">Pantalón</option>
                             <option value="Shorts">Shorts</option>
+                            <option value="Pants">Pants</option>
+                            <option value="Gorra">Gorra</option>
+                            <option value="Calcetines">Calcetines</option>
                         </select>
                     </div>
                     <div>

@@ -131,12 +131,16 @@ class HustleController extends Controller
         return redirect()->route('perfil')->with('success', 'WhatsApp actualizado: +' . $telefono);
     }
 
-    public function showCatalogo()
+    public function showCatalogo(Request $request)
     {
-        $productos = DB::connection('mongodb')->table('products')
-            ->where('vendido', '!=', true)
-            ->get();
-        return view('Hustle.catalogo', compact('productos'));
+        $categoriaActual = $request->query('categoria');
+        $query = DB::connection('mongodb')->table('products')
+            ->where('vendido', '!=', true);
+        if ($categoriaActual) {
+            $query->where('categoria', $categoriaActual);
+        }
+        $productos = $query->get();
+        return view('Hustle.catalogo', compact('productos', 'categoriaActual'));
     }
 
     // ZONA EXCLUSIVA CLIENTES
@@ -227,15 +231,19 @@ class HustleController extends Controller
         $key = $request->input('key');
         $accion = $request->input('accion');
 
+        if (!in_array($accion, ['incrementar', 'decrementar'], true)) {
+            return redirect()->route('carrito');
+        }
+
         if ($key && isset($carrito[$key])) {
             $esUnico = $carrito[$key]['unico'] ?? false;
             if ($accion === 'incrementar') {
                 if ($esUnico) {
                     return redirect()->route('carrito')->with('error', 'Producto único — solo 1 unidad.');
                 }
-                $carrito[$key]['cantidad']++;
+                $carrito[$key]['cantidad'] = min(99, $carrito[$key]['cantidad'] + 1);
             } elseif ($accion === 'decrementar') {
-                $carrito[$key]['cantidad']--;
+                $carrito[$key]['cantidad'] = max(0, $carrito[$key]['cantidad'] - 1);
                 if ($carrito[$key]['cantidad'] < 1) {
                     unset($carrito[$key]);
                 }
