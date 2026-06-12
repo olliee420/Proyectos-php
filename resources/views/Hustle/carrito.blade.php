@@ -23,21 +23,25 @@
                             <p class="text-steel text-xs">Talla: <span class="text-paper">{{ $item['talla'] ?? 'M' }}</span></p>
                         </div>
                         <div class="flex items-center gap-2 bg-white/5 rounded-full px-2 py-1">
-                            <form action="#" method="POST">
+                            <form action="{{ route('carrito.actualizar') }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="key" value="{{ $id }}">
+                                <input type="hidden" name="accion" value="decrementar">
                                 <button type="submit" class="w-7 h-7 flex items-center justify-center rounded-full bg-paper/10 text-paper text-sm hover:bg-paper/20 transition-colors cursor-pointer">&minus;</button>
                             </form>
                             <span class="text-paper font-semibold text-sm w-6 text-center">{{ $item['cantidad'] }}</span>
-                            <form action="#" method="POST">
+                            <form action="{{ route('carrito.actualizar') }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="key" value="{{ $id }}">
+                                <input type="hidden" name="accion" value="incrementar">
                                 <button type="submit" class="w-7 h-7 flex items-center justify-center rounded-full bg-paper/10 text-paper text-sm hover:bg-paper/20 transition-colors cursor-pointer">&plus;</button>
                             </form>
                         </div>
                         <div class="text-right shrink-0 ml-auto">
                             <p class="font-bold text-paper text-sm sm:text-base">${{ number_format($item['precio'] * $item['cantidad'], 2) }}</p>
-                            <form action="#" method="POST" onsubmit="return confirm('¿Remover este artículo?')">
+                            <form action="{{ route('carrito.eliminar') }}" method="POST" onsubmit="return confirm('¿Remover este artículo?')">
                                 @csrf
-                                @method('DELETE')
+                                <input type="hidden" name="key" value="{{ $id }}">
                                 <button type="submit" class="text-xs text-steel hover:text-red-400 transition-colors cursor-pointer">Eliminar</button>
                             </form>
                         </div>

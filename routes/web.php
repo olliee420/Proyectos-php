@@ -45,6 +45,12 @@ Route::get('/cliente/pedidos', [HustleController::class, 'showPedidos'])->name('
 // Ruta para añadir productos a la bolsa
 Route::post('/carrito/agregar', [HustleController::class, 'agregarAlCarrito'])->name('carrito.agregar');
 
+// Ruta para eliminar del carrito
+Route::post('/carrito/eliminar', [HustleController::class, 'eliminarDelCarrito'])->name('carrito.eliminar');
+
+// Ruta para actualizar cantidad
+Route::post('/carrito/actualizar', [HustleController::class, 'actualizarCantidad'])->name('carrito.actualizar');
+
 // 5. Checkout
 Route::get('/checkout', [HustleController::class, 'showCheckout'])->name('checkout');
 Route::post('/checkout/procesar', [HustleController::class, 'procesarPedido'])->name('checkout.procesar');

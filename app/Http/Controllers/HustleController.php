@@ -152,6 +152,37 @@ class HustleController extends Controller
         return redirect()->route('carrito')->with('success', '¡Prenda añadida a tu bolsa con éxito!');
     }
 
+    public function eliminarDelCarrito(Request $request)
+    {
+        $carrito = $request->session()->get('carrito', []);
+        $key = $request->input('key');
+        if ($key && isset($carrito[$key])) {
+            unset($carrito[$key]);
+            $request->session()->put('carrito', $carrito);
+        }
+        return redirect()->route('carrito')->with('success', 'Artículo eliminado del carrito.');
+    }
+
+    public function actualizarCantidad(Request $request)
+    {
+        $carrito = $request->session()->get('carrito', []);
+        $key = $request->input('key');
+        $accion = $request->input('accion');
+
+        if ($key && isset($carrito[$key])) {
+            if ($accion === 'incrementar') {
+                $carrito[$key]['cantidad']++;
+            } elseif ($accion === 'decrementar') {
+                $carrito[$key]['cantidad']--;
+                if ($carrito[$key]['cantidad'] < 1) {
+                    unset($carrito[$key]);
+                }
+            }
+            $request->session()->put('carrito', $carrito);
+        }
+        return redirect()->route('carrito');
+    }
+
     public function showPedidos(Request $request)
     {
         $usuarioId = Auth::id();
