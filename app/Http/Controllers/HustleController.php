@@ -82,7 +82,53 @@ class HustleController extends Controller
 
     public function showPerfil() {
         if (!Auth::check()) return redirect()->route('login');
-        return view('Hustle.perfil');
+        $usuario = Auth::user();
+        $userData = DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)
+            ->first();
+        $whatsapp = $this->getWhatsApp();
+        return view('Hustle.perfil', compact('userData', 'whatsapp'));
+    }
+
+    public function updatePerfil(Request $request) {
+        if (!Auth::check()) return redirect()->route('login');
+        $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'telefono'  => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:500',
+        ]);
+        $usuario = Auth::user();
+        DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)
+            ->update([
+                'nombre'    => $request->nombre,
+                'telefono'  => $request->telefono,
+                'direccion' => $request->direccion,
+            ]);
+        return redirect()->route('perfil')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function updatePerfilWhatsApp(Request $request) {
+        if (!Auth::check()) return redirect()->route('login');
+        $usuario = Auth::user();
+        $userArr = (array)DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)->first();
+        if (($userArr['rol'] ?? '') !== 'admin') {
+            return redirect()->route('perfil')->with('error', 'Solo administradores.');
+        }
+        $request->validate(['whatsapp' => 'required|string|max:20']);
+        $telefono = preg_replace('/[^0-9]/', '', $request->whatsapp);
+        if (substr($telefono, 0, 3) !== '503') $telefono = '503' . $telefono;
+        $exists = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')->first();
+        if ($exists) {
+            DB::connection('mongodb')->table('config')
+                ->where('key', 'whatsapp')->update(['value' => $telefono]);
+        } else {
+            DB::connection('mongodb')->table('config')
+                ->insert(['key' => 'whatsapp', 'value' => $telefono]);
+        }
+        return redirect()->route('perfil')->with('success', 'WhatsApp actualizado: +' . $telefono);
     }
 
     public function showCatalogo()
@@ -397,7 +443,11 @@ class HustleController extends Controller
             $totalEstimado += $item['precio'] * $item['cantidad'];
         }
 
-        return view('Hustle.checkout', compact('carrito', 'totalEstimado'));
+        $userData = DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)Auth::id())
+            ->first();
+
+        return view('Hustle.checkout', compact('carrito', 'totalEstimado', 'userData'));
     }
 
     public function procesarPedido(Request $request)

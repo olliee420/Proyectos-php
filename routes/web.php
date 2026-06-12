@@ -32,6 +32,8 @@ Route::get('/logout', [HustleController::class, 'logout'])->name('logout');
 // ==========================================
 Route::get('/menu', [HustleController::class, 'showMenu'])->name('menu');
 Route::get('/perfil', [HustleController::class, 'showPerfil'])->name('perfil');
+Route::post('/perfil/actualizar', [HustleController::class, 'updatePerfil'])->name('perfil.update');
+Route::post('/perfil/whatsapp', [HustleController::class, 'updatePerfilWhatsApp'])->name('perfil.whatsapp');
 Route::get('/catalogo', [HustleController::class, 'showCatalogo'])->name('catalogo');
 Route::get('/index', [HustleController::class, 'showIndex'])->name('index');
 

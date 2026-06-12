@@ -17,13 +17,13 @@
 
                 <div>
                     <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nombre Completo</label>
-                    <input type="text" name="nombre" value="{{ old('nombre', auth()->user()->nombre ?? '') }}" required
+                    <input type="text" name="nombre" value="{{ old('nombre', $userData->nombre ?? auth()->user()->nombre ?? '') }}" required
                            class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Teléfono</label>
-                    <input type="tel" name="telefono" value="{{ old('telefono') }}" placeholder="7555 1234" required
+                    <input type="tel" name="telefono" value="{{ old('telefono', $userData->telefono ?? '') }}" placeholder="7555 1234" required
                            class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                 </div>
 
@@ -31,7 +31,7 @@
                     <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Dirección de Envío</label>
                     <textarea name="direccion" rows="3" required
                               class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all resize-none"
-                              placeholder="Calle, número, colonia, ciudad, código postal">{{ old('direccion') }}</textarea>
+                              placeholder="Calle, número, colonia, ciudad, código postal">{{ old('direccion', $userData->direccion ?? '') }}</textarea>
                 </div>
 
                 <div>
