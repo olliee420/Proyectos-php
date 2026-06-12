@@ -161,7 +161,8 @@ class HustleController extends Controller
         $productos = DB::connection('mongodb')->table('products')
             ->orderBy('fecha_creacion', 'desc')
             ->get();
-        return view('Hustle.historial', compact('usuarios', 'productos'));
+        $whatsapp = $this->getWhatsApp();
+        return view('Hustle.historial', compact('usuarios', 'productos', 'whatsapp'));
     }
 
     public function destroyUser($id)
@@ -324,6 +325,130 @@ class HustleController extends Controller
             ->where('_id', (int)$id)
             ->delete();
         return redirect()->route('admin.panel')->with('success', 'Prenda eliminada permanentemente.');
+    }
+
+    // ==========================================
+    // CHECKOUT + WHATSAPP
+    // ==========================================
+
+    private function getWhatsApp()
+    {
+        $config = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')
+            ->first();
+        return $config ? $config->value : '521234567890';
+    }
+
+    public function showCheckout(Request $request)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+
+        $carrito = $request->session()->get('carrito', []);
+        if (empty($carrito)) {
+            return redirect()->route('carrito')->with('error', 'Tu bolsa está vacía.');
+        }
+
+        $totalEstimado = 0;
+        foreach ($carrito as $item) {
+            $totalEstimado += $item['precio'] * $item['cantidad'];
+        }
+
+        return view('Hustle.checkout', compact('carrito', 'totalEstimado'));
+    }
+
+    public function procesarPedido(Request $request)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+
+        $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'telefono'  => 'required|string|max:20',
+            'direccion' => 'required|string|max:500',
+            'notas'     => 'nullable|string|max:500',
+        ]);
+
+        $carrito = $request->session()->get('carrito', []);
+        if (empty($carrito)) {
+            return redirect()->route('carrito')->with('error', 'Tu bolsa está vacía.');
+        }
+
+        $total = 0;
+        $items = [];
+        foreach ($carrito as $id => $item) {
+            $subtotal = $item['precio'] * $item['cantidad'];
+            $total += $subtotal;
+            $items[] = [
+                'producto_id' => $item['id'] ?? $id,
+                'nombre'      => $item['nombre'],
+                'talla'       => $item['talla'] ?? 'M',
+                'cantidad'    => $item['cantidad'],
+                'precio'      => (float) $item['precio'],
+                'subtotal'    => $subtotal,
+            ];
+        }
+
+        $maxId = DB::connection('mongodb')->table('Pedidos')->max('_id');
+        $nuevoId = ($maxId ? (int)$maxId : 0) + 1;
+
+        DB::connection('mongodb')->table('Pedidos')->insert([
+            '_id'             => $nuevoId,
+            'usuario_id'      => Auth::id(),
+            'cliente_nombre'  => $request->nombre,
+            'cliente_telefono'=> $request->telefono,
+            'direccion'       => $request->direccion,
+            'notas'           => $request->notas,
+            'items'           => $items,
+            'total'           => $total,
+            'estado'          => 'Pendiente',
+            'fecha_creacion'  => now(),
+        ]);
+
+        $request->session()->put('ultimo_pedido_id', $nuevoId);
+
+        $telefono = $this->getWhatsApp();
+        $mensaje = "🛒 *NUEVO PEDIDO - HUSTLE HOUSE*\n\n";
+        $mensaje .= "👤 *Cliente:* {$request->nombre}\n";
+        $mensaje .= "📱 *Tel:* {$request->telefono}\n";
+        $mensaje .= "📍 *Dirección:* {$request->direccion}\n\n";
+        $mensaje .= "📦 *Productos:*\n";
+        foreach ($items as $item) {
+            $mensaje .= "• {$item['nombre']} ({$item['talla']}) x{$item['cantidad']} - \${$item['subtotal']}\n";
+        }
+        $mensaje .= "\n💰 *Total:* \${$total}\n";
+        if ($request->notas) {
+            $mensaje .= "\n📝 *Notas:* {$request->notas}\n";
+        }
+        $mensaje .= "\n✅ Pedido #{$nuevoId}";
+
+        $whatsappUrl = 'https://wa.me/' . $telefono . '?text=' . urlencode($mensaje);
+
+        $request->session()->forget('carrito');
+
+        return redirect()->away($whatsappUrl);
+    }
+
+    public function updateWhatsApp(Request $request)
+    {
+        $request->validate(['whatsapp' => 'required|string|max:20']);
+
+        $telefono = preg_replace('/[^0-9]/', '', $request->whatsapp);
+
+        $exists = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')
+            ->first();
+
+        if ($exists) {
+            DB::connection('mongodb')->table('config')
+                ->where('key', 'whatsapp')
+                ->update(['value' => $telefono]);
+        } else {
+            DB::connection('mongodb')->table('config')->insert([
+                'key'   => 'whatsapp',
+                'value' => $telefono,
+            ]);
+        }
+
+        return redirect()->route('admin.panel')->with('success', 'WhatsApp actualizado: +' . $telefono);
     }
 
 }

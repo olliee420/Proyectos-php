@@ -31,6 +31,22 @@
         <div class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm">{{ session('error') }}</div>
     @endif
 
+    <div class="mb-6 bg-white/5 rounded-soft p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div class="flex items-center gap-2 shrink-0">
+            <span class="text-lg">💬</span>
+            <span class="text-xs font-medium text-steel uppercase tracking-wider">WhatsApp Admin</span>
+        </div>
+        <form action="{{ route('admin.whatsapp.update') }}" method="POST" class="flex-1 flex gap-2">
+            @csrf
+            <input type="text" name="whatsapp" value="{{ $whatsapp ?? '521234567890' }}"
+                   class="flex-1 bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2 text-sm font-mono outline-none focus:ring-2 focus:ring-rust/30"
+                   placeholder="521234567890">
+            <button type="submit" class="px-4 py-2 bg-rust text-paper text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-rust-deep transition-colors cursor-pointer shrink-0">
+                Guardar
+            </button>
+        </form>
+    </div>
+
     @if(isset($editProducto))
         @php $ep = (array)$editProducto; @endphp
         <div class="mb-10 bg-white/5 rounded-soft p-6 border border-rust/30">

@@ -69,9 +69,9 @@
                     <span class="font-semibold text-paper text-sm">Total estimado</span>
                     <span class="font-bold text-paper text-xl">${{ number_format($totalEstimado ?? 0, 2) }}</span>
                 </div>
-                <button class="w-full py-3.5 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200 cursor-pointer">
+                <a href="{{ route('checkout') }}" class="block w-full py-3.5 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200 text-center">
                     Proceder al Pago &rarr;
-                </button>
+                </a>
             </div>
         </div>
     @else

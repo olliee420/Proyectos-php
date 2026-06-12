@@ -45,6 +45,10 @@ Route::get('/cliente/pedidos', [HustleController::class, 'showPedidos'])->name('
 // Ruta para añadir productos a la bolsa
 Route::post('/carrito/agregar', [HustleController::class, 'agregarAlCarrito'])->name('carrito.agregar');
 
+// 5. Checkout
+Route::get('/checkout', [HustleController::class, 'showCheckout'])->name('checkout');
+Route::post('/checkout/procesar', [HustleController::class, 'procesarPedido'])->name('checkout.procesar');
+
 
 // ==========================================
 // 4. ZONA EXCLUSIVA ADMINISTRADORES
@@ -64,3 +68,6 @@ Route::delete('/admin/productos/{id}', [HustleController::class, 'destroyProduct
 
 // 4. Ruta segura para eliminar un cliente de la colección 'Usuarios'
 Route::delete('/admin/usuarios/{id}', [HustleController::class, 'destroyUser'])->name('admin.users.destroy');
+
+// 5. WhatsApp Config
+Route::post('/admin/whatsapp', [HustleController::class, 'updateWhatsApp'])->name('admin.whatsapp.update');
