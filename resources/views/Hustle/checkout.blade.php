@@ -22,8 +22,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Teléfono (con código de país)</label>
-                    <input type="tel" name="telefono" value="{{ old('telefono') }}" placeholder="+52 55 1234 5678" required
+                    <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Teléfono</label>
+                    <input type="tel" name="telefono" value="{{ old('telefono') }}" placeholder="7555 1234" required
                            class="w-full bg-white/5 border border-white/10 text-paper placeholder-steel rounded-soft px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-rust/30 focus:border-rust/50 transition-all">
                 </div>
 

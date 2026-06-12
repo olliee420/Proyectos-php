@@ -63,7 +63,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
-                        <select name="categoria" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                        <select name="categoria" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                             <option value="Camisas Oversize" {{ ($ep['categoria']??'') === 'Camisas Oversize' ? 'selected' : '' }}>Camisas Oversize</option>
                             <option value="Hoodies" {{ ($ep['categoria']??'') === 'Hoodies' ? 'selected' : '' }}>Hoodies</option>
                             <option value="Gorras" {{ ($ep['categoria']??'') === 'Gorras' ? 'selected' : '' }}>Gorras</option>
@@ -77,12 +77,12 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nombre del Producto</label>
-                    <input type="text" name="nombre" value="{{ $ep['nombre'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                    <input type="text" name="nombre" value="{{ $ep['nombre'] ?? '' }}" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Precio ($)</label>
-                        <input type="number" name="precio" step="0.01" value="{{ $ep['precio'] ?? '' }}" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                        <input type="number" name="precio" step="0.01" value="{{ $ep['precio'] ?? '' }}" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Costo ($)</label>
@@ -93,6 +93,11 @@
                     <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Nueva Imagen (opcional)</label>
                     <input type="file" name="imagen" accept="image/*" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-paper file:text-ink file:text-xs file:font-semibold hover:file:bg-rust hover:file:text-paper transition-colors">
                 </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="hidden" name="unico" value="0">
+                    <input type="checkbox" name="unico" value="1" {{ ($ep['unico'] ?? false) ? 'checked' : '' }} class="w-4 h-4 rounded border-white/10 bg-white/5 text-rust focus:ring-rust/30 cursor-pointer">
+                    <span class="text-xs font-medium text-steel uppercase tracking-wider">Producto Único (sin talla ni cantidad)</span>
+                </label>
                 <div class="flex justify-end gap-3">
                     <a href="{{ route('admin.panel') }}" class="px-6 py-2.5 border border-white/10 text-steel text-sm font-semibold rounded-full hover:bg-white/10 transition-colors">Cancelar</a>
                     <button type="submit" class="px-6 py-2.5 bg-rust text-paper text-sm font-semibold uppercase tracking-wider rounded-full hover:bg-rust-deep transition-colors cursor-pointer">Guardar Cambios</button>
@@ -113,7 +118,7 @@
                     @csrf
                     <div>
                         <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Categoría</label>
-                        <select name="categoria" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                        <select name="categoria" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                             <option value="" selected disabled>Selecciona...</option>
                             <option value="Camisas Oversize">Camisas Oversize</option>
                             <option value="Hoodies">Hoodies</option>
@@ -132,7 +137,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-steel uppercase tracking-wider mb-1.5">Precio ($)</label>
-                            <input type="number" name="precio" step="0.01" class="w-full bg-white/5 border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                            <input type="number" name="precio" step="0.01" class="w-full bg-ink border border-white/10 text-paper rounded-soft px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
@@ -145,6 +150,11 @@
                             <input type="file" name="imagen" accept="image/*" class="w-full bg-white/5 border border-white/10 text-steel rounded-soft px-3 py-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-paper file:text-ink file:text-xs file:font-semibold hover:file:bg-rust hover:file:text-paper transition-colors" required>
                         </div>
                     </div>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="hidden" name="unico" value="0">
+                        <input type="checkbox" name="unico" value="1" class="w-4 h-4 rounded border-white/10 bg-white/5 text-rust focus:ring-rust/30 cursor-pointer">
+                        <span class="text-xs font-medium text-steel uppercase tracking-wider">Producto Único (sin talla ni cantidad)</span>
+                    </label>
                     <button type="submit" class="w-full py-3 bg-paper text-ink font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200 cursor-pointer">
                         Publicar Prenda Oficial
                     </button>

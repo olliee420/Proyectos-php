@@ -274,6 +274,7 @@ class HustleController extends Controller
             'precio'         => (float) $request->precio,
             'costo'          => (float) $request->costo,
             'imagen_path'    => $rutaImagen,
+            'unico'          => $request->boolean('unico'),
             'fecha_creacion' => now()
         ]);
 
@@ -320,6 +321,7 @@ class HustleController extends Controller
             'sku'       => strtoupper($request->sku),
             'precio'    => (float) $request->precio,
             'costo'     => (float) $request->costo,
+            'unico'     => $request->boolean('unico'),
         ];
 
         if ($request->hasFile('imagen')) {
@@ -450,7 +452,7 @@ class HustleController extends Controller
         $telefono = $this->getWhatsApp();
         $mensaje = "🛒 *NUEVO PEDIDO - HUSTLE HOUSE*\n\n";
         $mensaje .= "👤 *Cliente:* {$request->nombre}\n";
-        $mensaje .= "📱 *Tel:* {$request->telefono}\n";
+        $mensaje .= "📱 *Tel:* +503 {$request->telefono}\n";
         $mensaje .= "📍 *Dirección:* {$request->direccion}\n\n";
         $mensaje .= "📦 *Productos:*\n";
         foreach ($items as $item) {
@@ -474,6 +476,9 @@ class HustleController extends Controller
         $request->validate(['whatsapp' => 'required|string|max:20']);
 
         $telefono = preg_replace('/[^0-9]/', '', $request->whatsapp);
+        if (substr($telefono, 0, 3) !== '503') {
+            $telefono = '503' . $telefono;
+        }
 
         $exists = DB::connection('mongodb')->table('config')
             ->where('key', 'whatsapp')

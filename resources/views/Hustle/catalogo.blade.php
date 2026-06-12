@@ -30,17 +30,21 @@
                     <h3 class="font-semibold text-paper text-sm leading-tight truncate mt-1">{{ $prod->nombre }}</h3>
                     <p class="font-bold text-paper text-lg mt-1">${{ number_format($prod->precio, 2) }}</p>
 
+                    @php $esUnico = $prod->unico ?? false; @endphp
                     <form action="{{ route('carrito.agregar') }}" method="POST" class="mt-auto pt-4 space-y-3">
                         @csrf
                         <input type="hidden" name="producto_id" value="{{ $prod->_id ?? $prod->id ?? $prod['_id'] ?? '' }}">
-                        <select name="talla" class="w-full bg-white/5 text-paper border border-white/10 rounded-soft px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
-                            <option value="S">S</option>
-                            <option value="M" selected>M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
+                        <input type="hidden" name="talla" value="Única">
+                        @if(!$esUnico)
+                        <select name="talla" class="w-full bg-ink text-paper border border-white/10 rounded-soft px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                            <option value="S" class="bg-ink text-paper">S</option>
+                            <option value="M" selected class="bg-ink text-paper">M</option>
+                            <option value="L" class="bg-ink text-paper">L</option>
+                            <option value="XL" class="bg-ink text-paper">XL</option>
                         </select>
+                        @endif
                         <button type="submit" class="w-full px-4 py-2.5 bg-paper text-ink font-semibold text-xs uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200">
-                            Agregar &rarr;
+                            {{ $esUnico ? 'Agregar Único' : 'Agregar' }} &rarr;
                         </button>
                     </form>
                 </div>
