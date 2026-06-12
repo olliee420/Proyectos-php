@@ -16,17 +16,20 @@
             <h1 class="font-display text-3xl sm:text-4xl uppercase text-paper mt-1">Catálogo</h1>
             <p class="text-steel text-sm mt-1">El arte de mantener el ritmo urbano.</p>
         </div>
-        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-            <a href="{{ route('catalogo') }}"
-               class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors {{ !$categoriaActual ? 'bg-paper text-ink' : 'bg-transparent text-steel border border-white/10 hover:border-white/30' }}">
-                Todos
-            </a>
-            @foreach(['Camisa','Camiseta','Hoodie','Sweater','Chaqueta','Pantalón','Shorts','Pants','Gorra','Calcetines'] as $cat)
-                <a href="{{ route('catalogo', ['categoria' => $cat]) }}"
-                   class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors {{ $categoriaActual === $cat ? 'bg-paper text-ink' : 'bg-transparent text-steel border border-white/10 hover:border-white/30' }}">
-                    {{ $cat }}
+        <div class="relative w-full sm:w-auto">
+            <div class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none" style="-webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;">
+                <a href="{{ route('catalogo') }}"
+                   class="shrink-0 scroll-snap-start px-3.5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-all duration-200 {{ !$categoriaActual ? 'bg-paper text-ink shadow-sm' : 'bg-white/5 text-steel hover:bg-white/10 border border-white/5' }}">
+                    Todos
                 </a>
-            @endforeach
+                @foreach(['Camisa','Camiseta','Hoodie','Sweater','Chaqueta','Pantalón','Shorts','Pants','Gorra','Calcetines'] as $cat)
+                    <a href="{{ route('catalogo', ['categoria' => $cat]) }}"
+                       class="shrink-0 scroll-snap-start px-3.5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-all duration-200 {{ $categoriaActual === $cat ? 'bg-rust text-paper shadow-sm shadow-rust/20' : 'bg-white/5 text-steel hover:bg-white/10 border border-white/5' }}">
+                        {{ $cat }}
+                    </a>
+                @endforeach
+            </div>
+            <div class="absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-ink to-transparent pointer-events-none sm:hidden"></div>
         </div>
     </div>
 
