@@ -1,0 +1,12 @@
+vendor
+node_modules
+.git
+.env
+storage/framework/cache
+storage/framework/views
+storage/logs
+.idea
+.vscode
+*.log
+.DS_Store
+Thumbs.db

@@ -34,6 +34,10 @@
         background-color: var(--color-rust);
         color: var(--color-paper);
     }
+    select option {
+        background-color: var(--color-ink);
+        color: var(--color-paper);
+    }
 }
 
 @keyframes fade-in {

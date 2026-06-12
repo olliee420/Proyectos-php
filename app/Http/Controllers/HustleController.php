@@ -82,26 +82,83 @@ class HustleController extends Controller
 
     public function showPerfil() {
         if (!Auth::check()) return redirect()->route('login');
-        return view('Hustle.perfil');
+        $usuario = Auth::user();
+        $userData = DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)
+            ->first();
+        $whatsapp = $this->getWhatsApp();
+        return view('Hustle.perfil', compact('userData', 'whatsapp'));
     }
 
-    public function showCatalogo()
+    public function updatePerfil(Request $request) {
+        if (!Auth::check()) return redirect()->route('login');
+        $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'telefono'  => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:500',
+        ]);
+        $usuario = Auth::user();
+        DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)
+            ->update([
+                'nombre'    => $request->nombre,
+                'telefono'  => $request->telefono,
+                'direccion' => $request->direccion,
+            ]);
+        return redirect()->route('perfil')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function updatePerfilWhatsApp(Request $request) {
+        if (!Auth::check()) return redirect()->route('login');
+        $usuario = Auth::user();
+        $userArr = (array)DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)$usuario->id)->first();
+        if (($userArr['rol'] ?? '') !== 'admin') {
+            return redirect()->route('perfil')->with('error', 'Solo administradores.');
+        }
+        $request->validate(['whatsapp' => 'required|string|max:20']);
+        $telefono = preg_replace('/[^0-9]/', '', $request->whatsapp);
+        if (substr($telefono, 0, 3) !== '503') $telefono = '503' . $telefono;
+        $exists = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')->first();
+        if ($exists) {
+            DB::connection('mongodb')->table('config')
+                ->where('key', 'whatsapp')->update(['value' => $telefono]);
+        } else {
+            DB::connection('mongodb')->table('config')
+                ->insert(['key' => 'whatsapp', 'value' => $telefono]);
+        }
+        return redirect()->route('perfil')->with('success', 'WhatsApp actualizado: +' . $telefono);
+    }
+
+    public function showCatalogo(Request $request)
     {
-        $productos = DB::connection('mongodb')->table('products')
-            ->where('vendido', '!=', true)
-            ->get();
-        return view('Hustle.catalogo', compact('productos'));
+        $categoriaActual = $request->query('categoria');
+        $query = DB::connection('mongodb')->table('products')
+            ->where('vendido', '!=', true);
+        if ($categoriaActual) {
+            $query->where('categoria', $categoriaActual);
+        }
+        $productos = $query->get();
+        return view('Hustle.catalogo', compact('productos', 'categoriaActual'));
     }
 
     // ZONA EXCLUSIVA CLIENTES
     public function showCarrito(Request $request)
     {
         $carrito = $request->session()->get('carrito', []);
+        $descuento = $request->session()->get('descuento');
         $totalEstimado = 0;
         foreach($carrito as $item) {
             $totalEstimado += $item['precio'] * $item['cantidad'];
         }
-        return view('Hustle.carrito', compact('carrito', 'totalEstimado'));
+        $totalFinal = $totalEstimado;
+        $descuentoAplicado = 0;
+        if ($descuento && $descuento['porcentaje'] > 0) {
+            $descuentoAplicado = $totalEstimado * ($descuento['porcentaje'] / 100);
+            $totalFinal = $totalEstimado - $descuentoAplicado;
+        }
+        return view('Hustle.carrito', compact('carrito', 'totalEstimado', 'descuento', 'descuentoAplicado', 'totalFinal'));
     }
 
     public function agregarAlCarrito(Request $request)
@@ -116,22 +173,38 @@ class HustleController extends Controller
             ->first();
 
         if (!$producto) {
+            $producto = DB::connection('mongodb')->table('products')
+                ->where('id', (int)$request->producto_id)
+                ->first();
+        }
+
+        if (!$producto) {
             return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
         }
 
         $producto = (array) $producto;
+        $productoId = $producto['id'] ?? $producto['_id'] ?? null;
+        if (!$productoId) {
+            return redirect()->back()->with('error', 'El producto no se encuentra disponible.');
+        }
+
+        $esUnico = $producto['unico'] ?? false;
         $carrito = $request->session()->get('carrito', []);
-        $cartKey = $producto['_id'] . '_' . $request->talla;
+        $cartKey = $productoId . '_' . $request->talla;
 
         if (isset($carrito[$cartKey])) {
+            if ($esUnico) {
+                return redirect()->route('carrito')->with('error', 'Producto único — ya está en tu bolsa.');
+            }
             $carrito[$cartKey]['cantidad']++;
         } else {
             $carrito[$cartKey] = [
-                'id'          => $producto['_id'],
+                'id'          => $productoId,
                 'nombre'      => $producto['nombre'],
                 'precio'      => (float) $producto['precio'],
                 'categoria'   => $producto['categoria'] ?? 'Prenda',
                 'imagen_path' => $producto['imagen_path'] ?? 'uploads/products/default.jpg',
+                'unico'       => $esUnico,
                 'talla'       => $request->talla,
                 'cantidad'    => 1
             ];
@@ -139,6 +212,59 @@ class HustleController extends Controller
 
         $request->session()->put('carrito', $carrito);
         return redirect()->route('carrito')->with('success', '¡Prenda añadida a tu bolsa con éxito!');
+    }
+
+    public function eliminarDelCarrito(Request $request)
+    {
+        $carrito = $request->session()->get('carrito', []);
+        $key = $request->input('key');
+        if ($key && isset($carrito[$key])) {
+            unset($carrito[$key]);
+            $request->session()->put('carrito', $carrito);
+        }
+        return redirect()->route('carrito')->with('success', 'Artículo eliminado del carrito.');
+    }
+
+    public function actualizarCantidad(Request $request)
+    {
+        $carrito = $request->session()->get('carrito', []);
+        $key = $request->input('key');
+        $accion = $request->input('accion');
+
+        if (!in_array($accion, ['incrementar', 'decrementar'], true)) {
+            return redirect()->route('carrito');
+        }
+
+        if ($key && isset($carrito[$key])) {
+            $esUnico = $carrito[$key]['unico'] ?? false;
+            if ($accion === 'incrementar') {
+                if ($esUnico) {
+                    return redirect()->route('carrito')->with('error', 'Producto único — solo 1 unidad.');
+                }
+                $carrito[$key]['cantidad'] = min(99, $carrito[$key]['cantidad'] + 1);
+            } elseif ($accion === 'decrementar') {
+                $carrito[$key]['cantidad'] = max(0, $carrito[$key]['cantidad'] - 1);
+                if ($carrito[$key]['cantidad'] < 1) {
+                    unset($carrito[$key]);
+                }
+            }
+            $request->session()->put('carrito', $carrito);
+        }
+        return redirect()->route('carrito');
+    }
+
+    public function aplicarDescuento(Request $request)
+    {
+        $codigo = strtoupper(trim($request->input('codigo', '')));
+        if ($codigo === '') {
+            $request->session()->forget('descuento');
+            return redirect()->route('carrito')->with('success', 'Descuento eliminado.');
+        }
+        if ($codigo === 'HHSANTEIN') {
+            $request->session()->put('descuento', ['codigo' => 'HHSANTEIN', 'porcentaje' => 50]);
+            return redirect()->route('carrito')->with('success', '🎉 Descuento HHSANTEIN aplicado: 50% OFF!');
+        }
+        return redirect()->route('carrito')->with('error', 'Código de descuento inválido.');
     }
 
     public function showPedidos(Request $request)
@@ -151,6 +277,19 @@ class HustleController extends Controller
         return view('Hustle.pedidos', compact('pedidos'));
     }
 
+    public function showPedidoDetalle(Request $request, $id)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+        $pedido = DB::connection('mongodb')->table('Pedidos')
+            ->where('_id', (int)$id)
+            ->where('usuario_id', Auth::id())
+            ->first();
+        if (!$pedido) {
+            return redirect()->route('pedidos')->with('error', 'Pedido no encontrado.');
+        }
+        return view('Hustle.pedido-detalle', compact('pedido'));
+    }
+
     // ZONA EXCLUSIVA ADMINISTRADORES
 
     public function showAdminPanel()
@@ -161,7 +300,8 @@ class HustleController extends Controller
         $productos = DB::connection('mongodb')->table('products')
             ->orderBy('fecha_creacion', 'desc')
             ->get();
-        return view('Hustle.historial', compact('usuarios', 'productos'));
+        $whatsapp = $this->getWhatsApp();
+        return view('Hustle.historial', compact('usuarios', 'productos', 'whatsapp'));
     }
 
     public function destroyUser($id)
@@ -231,6 +371,7 @@ class HustleController extends Controller
             'precio'         => (float) $request->precio,
             'costo'          => (float) $request->costo,
             'imagen_path'    => $rutaImagen,
+            'unico'          => $request->boolean('unico'),
             'fecha_creacion' => now()
         ]);
 
@@ -277,6 +418,7 @@ class HustleController extends Controller
             'sku'       => strtoupper($request->sku),
             'precio'    => (float) $request->precio,
             'costo'     => (float) $request->costo,
+            'unico'     => $request->boolean('unico'),
         ];
 
         if ($request->hasFile('imagen')) {
@@ -324,6 +466,161 @@ class HustleController extends Controller
             ->where('_id', (int)$id)
             ->delete();
         return redirect()->route('admin.panel')->with('success', 'Prenda eliminada permanentemente.');
+    }
+
+    // ==========================================
+    // CHECKOUT + WHATSAPP
+    // ==========================================
+
+    private function getWhatsApp()
+    {
+        $config = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')
+            ->first();
+        return $config ? $config->value : '521234567890';
+    }
+
+    public function showCheckout(Request $request)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+
+        $carrito = $request->session()->get('carrito', []);
+        if (empty($carrito)) {
+            return redirect()->route('carrito')->with('error', 'Tu bolsa está vacía.');
+        }
+
+        $totalEstimado = 0;
+        foreach ($carrito as $item) {
+            $totalEstimado += $item['precio'] * $item['cantidad'];
+        }
+
+        $userData = DB::connection('mongodb')->table('usuarios')
+            ->where('_id', (int)Auth::id())
+            ->first();
+
+        $descuento = $request->session()->get('descuento');
+        $totalFinal = $totalEstimado;
+        $descuentoAplicado = 0;
+        if ($descuento && ($descuento['porcentaje'] ?? 0) > 0) {
+            $descuentoAplicado = $totalEstimado * ($descuento['porcentaje'] / 100);
+            $totalFinal = $totalEstimado - $descuentoAplicado;
+        }
+
+        return view('Hustle.checkout', compact('carrito', 'totalEstimado', 'userData', 'descuento', 'descuentoAplicado', 'totalFinal'));
+    }
+
+    public function procesarPedido(Request $request)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+
+        $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'telefono'  => 'required|string|max:20',
+            'direccion' => 'required|string|max:500',
+            'notas'     => 'nullable|string|max:500',
+        ]);
+
+        $carrito = $request->session()->get('carrito', []);
+        if (empty($carrito)) {
+            return redirect()->route('carrito')->with('error', 'Tu bolsa está vacía.');
+        }
+
+        $total = 0;
+        $items = [];
+        foreach ($carrito as $id => $item) {
+            $subtotal = $item['precio'] * $item['cantidad'];
+            $total += $subtotal;
+            $items[] = [
+                'producto_id' => $item['id'] ?? $id,
+                'nombre'      => $item['nombre'],
+                'talla'       => $item['talla'] ?? 'M',
+                'cantidad'    => $item['cantidad'],
+                'precio'      => (float) $item['precio'],
+                'subtotal'    => $subtotal,
+            ];
+        }
+
+        $descuento = $request->session()->get('descuento');
+        $totalFinal = $total;
+        $descuentoAplicado = 0;
+        $codigoUsado = null;
+        if ($descuento && ($descuento['porcentaje'] ?? 0) > 0) {
+            $descuentoAplicado = $total * ($descuento['porcentaje'] / 100);
+            $totalFinal = $total - $descuentoAplicado;
+            $codigoUsado = $descuento['codigo'];
+        }
+
+        $maxId = DB::connection('mongodb')->table('Pedidos')->max('_id');
+        $nuevoId = ($maxId ? (int)$maxId : 0) + 1;
+
+        DB::connection('mongodb')->table('Pedidos')->insert([
+            '_id'             => $nuevoId,
+            'usuario_id'      => Auth::id(),
+            'cliente_nombre'  => $request->nombre,
+            'cliente_telefono'=> $request->telefono,
+            'direccion'       => $request->direccion,
+            'notas'           => $request->notas,
+            'items'           => $items,
+            'total'           => $totalFinal,
+            'descuento'       => $descuentoAplicado > 0 ? $descuentoAplicado : 0,
+            'codigo_descuento'=> $codigoUsado,
+            'estado'          => 'Pendiente',
+            'fecha_creacion'  => now(),
+        ]);
+
+        $request->session()->put('ultimo_pedido_id', $nuevoId);
+
+        $telefono = $this->getWhatsApp();
+        $mensaje = "🛒 *NUEVO PEDIDO - HUSTLE HOUSE*\n\n";
+        $mensaje .= "👤 *Cliente:* {$request->nombre}\n";
+        $mensaje .= "📱 *Tel:* +503 {$request->telefono}\n";
+        $mensaje .= "📍 *Dirección:* {$request->direccion}\n\n";
+        $mensaje .= "📦 *Productos:*\n";
+        foreach ($items as $item) {
+            $mensaje .= "• {$item['nombre']} ({$item['talla']}) x{$item['cantidad']} - \${$item['subtotal']}\n";
+        }
+        if ($codigoUsado) {
+            $mensaje .= "\n🎉 *Descuento {$descuento['porcentaje']}% ({$codigoUsado}):* -\${$descuentoAplicado}\n";
+        }
+        $mensaje .= "\n💰 *Total:* \${$totalFinal}\n";
+        if ($request->notas) {
+            $mensaje .= "\n📝 *Notas:* {$request->notas}\n";
+        }
+        $mensaje .= "\n✅ Pedido #{$nuevoId}";
+
+        $whatsappUrl = 'https://wa.me/' . $telefono . '?text=' . urlencode($mensaje);
+
+        $request->session()->forget('carrito');
+        $request->session()->forget('descuento');
+
+        return redirect()->away($whatsappUrl);
+    }
+
+    public function updateWhatsApp(Request $request)
+    {
+        $request->validate(['whatsapp' => 'required|string|max:20']);
+
+        $telefono = preg_replace('/[^0-9]/', '', $request->whatsapp);
+        if (substr($telefono, 0, 3) !== '503') {
+            $telefono = '503' . $telefono;
+        }
+
+        $exists = DB::connection('mongodb')->table('config')
+            ->where('key', 'whatsapp')
+            ->first();
+
+        if ($exists) {
+            DB::connection('mongodb')->table('config')
+                ->where('key', 'whatsapp')
+                ->update(['value' => $telefono]);
+        } else {
+            DB::connection('mongodb')->table('config')->insert([
+                'key'   => 'whatsapp',
+                'value' => $telefono,
+            ]);
+        }
+
+        return redirect()->route('admin.panel')->with('success', 'WhatsApp actualizado: +' . $telefono);
     }
 
 }

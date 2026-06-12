@@ -2,24 +2,43 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $users = [
+            [
+                'nombre'         => 'Admin',
+                'email'          => 'admin@hustlehouse.com',
+                'password'       => Hash::make('admin123'),
+                'rol'            => 'admin',
+                'fecha_creacion' => now(),
+            ],
+            [
+                'nombre'         => 'Fabian',
+                'email'          => 'fabian@hustlehouse.com',
+                'password'       => Hash::make('pollito00'),
+                'rol'            => 'cliente',
+                'fecha_creacion' => now(),
+            ],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $collection = DB::connection('mongodb')->table('usuarios');
+
+        foreach ($users as $user) {
+            $exists = $collection->where('email', $user['email'])->first();
+            if (!$exists) {
+                $maxId = $collection->max('_id') ?? 0;
+                $user['_id'] = (int)$maxId + 1;
+                $collection->insert($user);
+                echo "  ✅ Created: {$user['email']}\n";
+            } else {
+                echo "  ⏭️  Skipped (exists): {$user['email']}\n";
+            }
+        }
     }
 }

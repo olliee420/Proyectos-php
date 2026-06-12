@@ -4,16 +4,32 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 lg:px-8 py-12 w-full">
+    @if(session('success'))
+        <div class="mb-6 p-3 bg-rust/10 border border-rust/20 rounded-soft text-rust text-sm">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-soft text-red-400 text-sm">{{ session('error') }}</div>
+    @endif
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
         <div>
             <span class="text-rust font-semibold text-xs uppercase tracking-[0.2em]">Drop 01</span>
             <h1 class="font-display text-3xl sm:text-4xl uppercase text-paper mt-1">Catálogo</h1>
             <p class="text-steel text-sm mt-1">El arte de mantener el ritmo urbano.</p>
         </div>
-        <div class="flex gap-2">
-            <button class="px-4 py-2 bg-paper text-ink text-xs font-semibold uppercase tracking-wider rounded-full">Todos</button>
-            <button class="px-4 py-2 bg-transparent text-steel text-xs font-semibold uppercase tracking-wider rounded-full border border-white/10 hover:border-white/30 transition-colors">Playeras</button>
-            <button class="px-4 py-2 bg-transparent text-steel text-xs font-semibold uppercase tracking-wider rounded-full border border-white/10 hover:border-white/30 transition-colors">Sudaderas</button>
+        <div class="relative w-full sm:w-auto">
+            <div class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none" style="-webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;">
+                <a href="{{ route('catalogo') }}"
+                   class="shrink-0 scroll-snap-start px-3.5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-all duration-200 {{ !$categoriaActual ? 'bg-paper text-ink shadow-sm' : 'bg-white/5 text-steel hover:bg-white/10 border border-white/5' }}">
+                    Todos
+                </a>
+                @foreach(['Camisa','Camiseta','Hoodie','Sweater','Chaqueta','Pantalón','Shorts','Pants','Gorra','Calcetines'] as $cat)
+                    <a href="{{ route('catalogo', ['categoria' => $cat]) }}"
+                       class="shrink-0 scroll-snap-start px-3.5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full transition-all duration-200 {{ $categoriaActual === $cat ? 'bg-rust text-paper shadow-sm shadow-rust/20' : 'bg-white/5 text-steel hover:bg-white/10 border border-white/5' }}">
+                        {{ $cat }}
+                    </a>
+                @endforeach
+            </div>
+            <div class="absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-ink to-transparent pointer-events-none sm:hidden"></div>
         </div>
     </div>
 
@@ -30,17 +46,21 @@
                     <h3 class="font-semibold text-paper text-sm leading-tight truncate mt-1">{{ $prod->nombre }}</h3>
                     <p class="font-bold text-paper text-lg mt-1">${{ number_format($prod->precio, 2) }}</p>
 
+                    @php $esUnico = $prod->unico ?? false; @endphp
                     <form action="{{ route('carrito.agregar') }}" method="POST" class="mt-auto pt-4 space-y-3">
                         @csrf
                         <input type="hidden" name="producto_id" value="{{ $prod->_id ?? $prod->id ?? $prod['_id'] ?? '' }}">
-                        <select name="talla" class="w-full bg-white/5 text-paper border border-white/10 rounded-soft px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
-                            <option value="S">S</option>
-                            <option value="M" selected>M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
+                        <input type="hidden" name="talla" value="Única">
+                        @if(!$esUnico)
+                        <select name="talla" class="w-full bg-ink text-paper border border-white/10 rounded-soft px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/30" required>
+                            <option value="S" class="bg-ink text-paper">S</option>
+                            <option value="M" selected class="bg-ink text-paper">M</option>
+                            <option value="L" class="bg-ink text-paper">L</option>
+                            <option value="XL" class="bg-ink text-paper">XL</option>
                         </select>
+                        @endif
                         <button type="submit" class="w-full px-4 py-2.5 bg-paper text-ink font-semibold text-xs uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-all duration-200">
-                            Agregar &rarr;
+                            {{ $esUnico ? 'Agregar Único' : 'Agregar' }} &rarr;
                         </button>
                     </form>
                 </div>
@@ -48,10 +68,10 @@
         @empty
             <div class="col-span-2 lg:col-span-4 text-center py-20">
                 <span class="text-4xl block mb-4">👕</span>
-                <h3 class="font-display text-2xl uppercase text-paper">No hay prendas disponibles</h3>
+                <h3 class="font-display text-2xl uppercase text-paper">{{ $categoriaActual ? 'No hay '.$categoriaActual.'s disponibles' : 'No hay prendas disponibles' }}</h3>
                 <p class="text-steel text-sm mt-2">Ve al panel de administración para añadir productos al catálogo.</p>
             </div>
         @endforelse
     </div>
 </div>
-@endsection
+@endSection

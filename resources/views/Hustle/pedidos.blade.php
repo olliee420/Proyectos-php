@@ -11,50 +11,51 @@
 
     <div class="space-y-4">
         @forelse($pedidos as $pedido)
+            @php $p = (array)$pedido; $primerItem = ($p['items'][0] ?? []); if(is_object($primerItem)) $primerItem = (array)$primerItem; @endphp
             <div class="bg-white/5 rounded-soft overflow-hidden">
                 <div class="bg-ink border-b border-white/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex flex-wrap gap-6 text-sm">
                         <div>
                             <span class="text-steel text-xs uppercase tracking-wider block">Pedido</span>
-                            <span class="text-paper font-medium">{{ isset($pedido->fecha_creacion) ? \Carbon\Carbon::parse($pedido->fecha_creacion)->format('d M, Y') : 'Sin fecha' }}</span>
+                            <span class="text-paper font-medium">{{ isset($p['fecha_creacion']) ? \Carbon\Carbon::parse($p['fecha_creacion'])->format('d M, Y') : 'Sin fecha' }}</span>
                         </div>
                         <div>
                             <span class="text-steel text-xs uppercase tracking-wider block">Total</span>
-                            <span class="text-paper font-semibold">${{ number_format($pedido->total ?? 0, 2) }}</span>
+                            <span class="text-paper font-semibold">${{ number_format($p['total'] ?? 0, 2) }}</span>
                         </div>
                         <div>
-                            <span class="text-steel text-xs uppercase tracking-wider block">Rastreo</span>
-                            <span class="text-steel font-mono text-xs">#{{ $pedido->id_rastreo ?? 'HH-XXXXX' }}</span>
+                            <span class="text-steel text-xs uppercase tracking-wider block">Productos</span>
+                            <span class="text-paper font-medium text-xs">{{ count($p['items'] ?? []) }} {{ count($p['items'] ?? []) == 1 ? 'prenda' : 'prendas' }}</span>
                         </div>
                     </div>
                     <div>
-                        @if(($pedido->estado ?? '') === 'Entregado')
+                        @if(($p['estado'] ?? '') === 'Entregado')
                             <span class="inline-block px-3 py-1 bg-rust/20 text-rust text-xs font-semibold uppercase tracking-wider rounded-full">✅ Entregado</span>
+                        @elseif(($p['estado'] ?? '') === 'Cancelado')
+                            <span class="inline-block px-3 py-1 bg-red-500/10 text-red-400 text-xs font-semibold uppercase tracking-wider rounded-full">❌ Cancelado</span>
                         @else
-                            <span class="inline-block px-3 py-1 bg-white/10 text-steel text-xs font-semibold uppercase tracking-wider rounded-full">🚚 En camino</span>
+                            <span class="inline-block px-3 py-1 bg-white/10 text-steel text-xs font-semibold uppercase tracking-wider rounded-full">🕐 {{ $p['estado'] ?? 'Pendiente' }}</span>
                         @endif
                     </div>
                 </div>
 
                 <div class="p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 shrink-0 bg-concrete/5 rounded-soft overflow-hidden">
-                            <img src="{{ asset($pedido->imagen_path ?? 'uploads/products/default.jpg') }}" alt="Prenda" class="w-full h-full object-cover">
+                        <div class="w-12 h-12 shrink-0 bg-concrete/5 rounded-soft overflow-hidden flex items-center justify-center text-lg">
+                            👕
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-paper text-sm">{{ $pedido->producto_nombre ?? 'Prenda Oficial Drop' }}</h4>
-                            <span class="text-steel text-xs">Talla: {{ $pedido->talla ?? 'M' }} | Cant: {{ $pedido->cantidad ?? 1 }}</span>
+                        <div class="min-w-0">
+                            <h4 class="font-semibold text-paper text-sm truncate">{{ $primerItem['nombre'] ?? 'Prenda' }}{{ count($p['items'] ?? []) > 1 ? ' + '.(count($p['items']) - 1).' más' : '' }}</h4>
+                            <span class="text-steel text-xs">Pedido #{{ $p['_id'] ?? $p['id'] ?? 'N/A' }}</span>
                         </div>
                     </div>
-                    <span class="font-semibold text-paper text-sm">${{ number_format($pedido->precio_unitario ?? $pedido->total ?? 0, 2) }}</span>
+                    <span class="font-semibold text-paper text-sm shrink-0">${{ number_format($p['total'] ?? 0, 2) }}</span>
                 </div>
 
                 <div class="px-4 pb-4 flex justify-end gap-2">
-                    @if(($pedido->estado ?? '') === 'Entregado')
-                        <a href="{{ route('catalogo') }}" class="px-4 py-2 border border-white/10 text-paper text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-white/10 transition-colors">Comprar de Nuevo</a>
-                    @else
-                        <button class="px-4 py-2 border border-white/10 text-steel text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-white/10 transition-colors cursor-pointer">Rastrear Envío</button>
-                        <button class="px-4 py-2 bg-paper text-ink text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-colors cursor-pointer">Ver Recibo</button>
+                    <a href="{{ route('pedidos.detalle', $p['_id'] ?? $p['id']) }}" class="px-4 py-2 border border-white/10 text-paper text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-white/10 transition-colors">Ver Detalle</a>
+                    @if(($p['estado'] ?? '') === 'Cancelado')
+                        <a href="{{ route('catalogo') }}" class="px-4 py-2 bg-paper text-ink text-xs font-semibold uppercase tracking-wider rounded-full hover:bg-rust hover:text-paper transition-colors">Comprar de Nuevo</a>
                     @endif
                 </div>
             </div>
