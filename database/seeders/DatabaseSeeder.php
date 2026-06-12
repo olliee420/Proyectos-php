@@ -32,8 +32,8 @@ class DatabaseSeeder extends Seeder
         foreach ($users as $user) {
             $exists = $collection->where('email', $user['email'])->first();
             if (!$exists) {
-                $maxId = $collection->max('id') ?? 0;
-                $user['id'] = (int)$maxId + 1;
+                $maxId = $collection->max('_id') ?? 0;
+                $user['_id'] = (int)$maxId + 1;
                 $collection->insert($user);
                 echo "  ✅ Created: {$user['email']}\n";
             } else {
