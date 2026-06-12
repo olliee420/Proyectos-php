@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Pedido #'.$pedido->_id.' — HUSTLE HOUSE')
+@section('title', 'Pedido #'.($pedido->id ?? $pedido->_id ?? '').' — HUSTLE HOUSE')
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 lg:px-8 py-12 w-full">
@@ -10,7 +10,7 @@
 
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="font-display text-3xl uppercase text-paper">Pedido #{{ $p['_id'] }}</h1>
+            <h1 class="font-display text-3xl uppercase text-paper">Pedido #{{ $p['_id'] ?? $p['id'] ?? '' }}</h1>
             <p class="text-steel text-sm mt-1">
                 {{ isset($p['fecha_creacion']) ? \Carbon\Carbon::parse($p['fecha_creacion'])->format('d M, Y \\a \\l\\a\\s h:i A') : 'Sin fecha' }}
             </p>
